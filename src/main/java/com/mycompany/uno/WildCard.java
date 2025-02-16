@@ -12,7 +12,7 @@ public class WildCard extends Card {
     private String effect; // "Wild" or "Wild Draw Four"
 
     public WildCard(String effect) {
-        super("Wild"); // Wild cards have no fixed color initially
+        super("Wild");
         this.effect = effect;
     }
 
@@ -20,7 +20,7 @@ public class WildCard extends Card {
         return effect;
     }
 
-    public void setColor(String color) { // Allows changing the color when played
+    public void setColor(String color) {
         this.color = color;
     }
 
