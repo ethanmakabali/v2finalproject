@@ -21,7 +21,7 @@ public class ActionCard extends Card {
     public String getActionType() {
         return actionType;
     }
-
+    
     @Override
     public String toString() {
         return color + " " + actionType;
