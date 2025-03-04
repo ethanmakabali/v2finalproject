@@ -64,5 +64,11 @@ public class Deck {
     public ArrayList<Card> getMainPile(){
         return this.mainPile;
     }
+    
+    public ArrayList<Card> getDiscardPile(){
+        return this.discardPile;
+    }
+    
+    
 }
 

@@ -1,9 +1,6 @@
 package com.mycompany.uno;
 
 
-import java.awt.Color;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
 import java.util.ArrayList;
 import javax.swing.JButton;
 import javax.swing.JLabel;
@@ -25,6 +22,7 @@ public class LiveGameWin extends javax.swing.JFrame {
      private ArrayList<JButton> btnCardSlots;
      private int numberOfPlayers;
      private Game game;
+     private Deck deck;
      
     /**
      * Creates new form LiveGame
@@ -41,13 +39,14 @@ public class LiveGameWin extends javax.swing.JFrame {
         turnOnNoMovesPanel(true);
         this.numberOfPlayers = numberOfPlayers;
         System.out.println("Creating object");
-        Deck deck = new Deck();
+        this.deck = new Deck();
         System.out.println("Done");
         ArrayList<Card> mainPile = deck.getMainPile();
         Game game = new Game(names, deck, mainPile);
         this.game = game;
         setFaceDownCards();
         turnOffOtherFaceCardsAtStart();
+        checkLegalMoves();
 //        System.out.println("TESTTTT");
         //https://www.shutterstock.com/image-vector/bangkok-thailand-may-212021-deck-600nw-1977486767.jpg
     }
@@ -75,21 +74,21 @@ public class LiveGameWin extends javax.swing.JFrame {
                 }
             }
             if(i == 1){
-                int player2Size = game.getPlayerDeckSize(0);
+                int player2Size = game.getPlayerDeckSize(1);
                 for(int j = player2Size; j < 20; j++){
                     player2FaceDownCards.get(j).setVisible(false);
                     lblPlayer2FaceDownCardsCount.setText(String.valueOf(player2Size));
                 }
             }
             if(i == 2){
-                int player3Size = game.getPlayerDeckSize(0);
+                int player3Size = game.getPlayerDeckSize(2);
                 for(int j = player3Size; j < 20; j++){
                     player3FaceDownCards.get(j).setVisible(false);
                     lblPlayer3FaceDownCardsCount.setText(String.valueOf(player3Size));
                 }
             }
             if(i == 3){
-                int player4Size = game.getPlayerDeckSize(0);
+                int player4Size = game.getPlayerDeckSize(3);
                 for(int j = player4Size; j < 20; j++){
                     player4FaceDownCards.get(j).setVisible(false);
                     lblPlayer4FaceDownCardsCount.setText(String.valueOf(player4Size));
@@ -247,6 +246,49 @@ public class LiveGameWin extends javax.swing.JFrame {
         hideCards.setVisible(true);
     }
     
+    private boolean checkLegalMoves(){
+        ArrayList<Card> discardPile = deck.getDiscardPile();
+        int lastIndex = discardPile.size() - 1; // Top  of the deck
+        if(discardPile.isEmpty()){
+            return true;
+        }
+        else{
+            return false;
+        }
+    }
+    
+    private void playCard(int cardIndex){
+        if (game.isMoveLegal() == true){
+            ArrayList<Card> discardPile = deck.getDiscardPile();
+            Card playerCard = game.getCurrentPlayerDeck().get(cardIndex - 1);
+            discardPile.add(playerCard);
+            game.getCurrentPlayerDeck().remove(cardIndex - 1);
+            System.out.println("You played this card: " + playerCard);
+            int size = game.getCurrentPlayerDeck().size();
+            System.out.println("Your deck now contains " + size + " elements");
+            setFaceDownCards();
+            game.moveToNextPlayer();
+        }
+        else if(game.isMoveLegal() == false){
+            JOptionPane.showMessageDialog(null, "Please play a legal move", "Invalid Move", JOptionPane.INFORMATION_MESSAGE);
+        }
+        
+        if(game.isThereWinner() == true){
+            Player winner = game.getWinner();
+            WinnerWin winnerScreen = new WinnerWin(winner);
+            winnerScreen.setVisible(true);
+        }
+        System.out.println(game.isThereWinner());
+    }
+    
+    private void handleMove(){
+        if(checkLegalMoves() == true){
+            handleMove();
+        }else{
+            
+        }
+        
+    }
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -415,6 +457,13 @@ public class LiveGameWin extends javax.swing.JFrame {
         btnCardSlot1.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnCardSlot1ActionPerformed(evt);
+            }
+        });
+
+        btnCardSlot2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/red_draw2.png"))); // NOI18N
+        btnCardSlot2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnCardSlot2ActionPerformed(evt);
             }
         });
 
@@ -1307,8 +1356,15 @@ public class LiveGameWin extends javax.swing.JFrame {
     private void btnCardSlot1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCardSlot1ActionPerformed
         // TODO add your handling code here:
         createHideCardsWindow();
+        playCard(1);
+        int mainPileSize = deck.getMainPile().size();
+        System.out.println("The main pile now has " + mainPileSize);
         game.moveToNextPlayer();
     }//GEN-LAST:event_btnCardSlot1ActionPerformed
+
+    private void btnCardSlot2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCardSlot2ActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_btnCardSlot2ActionPerformed
 
     
     /**

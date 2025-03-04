@@ -41,6 +41,10 @@ public class Player {
         return size;
     }
     
+    public ArrayList<Card> getCurrentPlayerDeck(){
+        return this.cards;
+    }
+    
     public void generateRandomDecks(){
         // Simulate the drawing pattern, alternates
         for(int i = 0; i < 7; i++){
@@ -48,5 +52,10 @@ public class Player {
             mainPile.remove(i);
             this.cards.add(card);
         }
+    }
+    
+    @Override
+    public String toString(){
+        return this.playerName;
     }
 }

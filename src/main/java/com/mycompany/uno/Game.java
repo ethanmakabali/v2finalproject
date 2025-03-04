@@ -23,6 +23,7 @@ public class Game {
     private int nextIndex;
     private boolean clockWise;
     private Player player;
+    private Player winner;
     
     public Game(ArrayList<String> playerNames, Deck deck, ArrayList<Card>mainPile){
         this.turns = new ArrayList<>();
@@ -45,14 +46,48 @@ public class Game {
         this.nextPlayer = players.get(nextIndex);
         this.previousPlayer = null;
         this.clockWise = true;
+        this.winner = null;
     }
     
     public int getPlayerDeckSize(int playerNum) {
         return players.get(playerNum).getCurrentPlayerDeckSize();
     }
     
+    public ArrayList<Card> getPlayerDeck(int playerNum){
+        return players.get(playerNum).getCurrentPlayerDeck();
+    }
+    
+    public ArrayList<Card> getCurrentPlayerDeck(){
+        Player currentPlayer = getCurrentPlayer();
+        return currentPlayer.getCurrentPlayerDeck();
+    }
+    
+    public boolean isThereWinner() {
+        for (int i = 0; i < numberOfPlayers; i++) {
+            if (getPlayerDeck(i).isEmpty()) {  // Check if a player has no cards left
+                winner = getThisPlayer(i); // Assign the winner
+                return true;  // Return immediately when a winner is found
+            }
+        }
+        return false; // If no player has an empty deck, return false
+    }
+    
+
+    
+    public boolean isMoveLegal(){
+        return true;
+    }
+    
     public ArrayList<Player> getPlayers(){
         return this.players;
+    }
+    
+    public Player getWinner(){
+        return this.winner;
+    }
+    
+    public Player getThisPlayer(int i){
+        return players.get(i);
     }
     
     public Player getCurrentPlayer(){
@@ -115,6 +150,8 @@ public class Game {
         System.out.println("next player: " + nextPlayer);
         System.out.println("-----------------------------");
     }
+    
+    
     
     
     public void setNumberOfPlayers(int numPlayers){
