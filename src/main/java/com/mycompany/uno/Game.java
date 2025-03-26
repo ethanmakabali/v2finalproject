@@ -15,17 +15,22 @@ public class Game {
     private ArrayList<Integer> turns;
     private int numberOfPlayers;
     private int turn;
+    
     private ArrayList<String> playerNames;
     private ArrayList<Player> players;
+    private ArrayList<Card> mainPile;
+    
     private Player currentPlayer;
     private Player previousPlayer;
     private Player nextPlayer;
     private int nextIndex;
     private boolean clockWise;
-    private Player player;
     private Player winner;
     
-    public Game(ArrayList<String> playerNames, Deck deck, ArrayList<Card>mainPile){
+    private Deck deck;
+    
+    public Game(ArrayList<String> playerNames, Deck deck){
+        this.deck = deck;
         this.turns = new ArrayList<>();
         this.players = new ArrayList<>();
         this.numberOfPlayers = playerNames.size();
@@ -35,12 +40,11 @@ public class Game {
 //            System.out.println("in the loop");
             String name = playerNames.get(i);
 //            System.out.println(name + ':');
-            Player player = new Player(name,i+1, numberOfPlayers, mainPile);
+            Player player = new Player(name, i+1, numberOfPlayers, deck);
             players.add(player);
 //            System.out.println(numberOfPlayers);
         }
         System.out.println("players: " + playerNames);
-        this.player = player;
         this.currentPlayer = players.get(0);
         this.nextIndex = 1;
         this.nextPlayer = players.get(nextIndex);
@@ -58,25 +62,97 @@ public class Game {
     }
     
     public ArrayList<Card> getCurrentPlayerDeck(){
-        Player currentPlayer = getCurrentPlayer();
-        return currentPlayer.getCurrentPlayerDeck();
+        return this.currentPlayer.getCurrentPlayerDeck();
+    }
+    
+    public boolean playCard(Player player, Card card, String declaredColor) {
+        if (this.currentPlayer != player) {
+            // Reset the game to this player
+            System.err.println("The current player doesn't match incoming player");
+            this.currentPlayer = player;
+        }
+        
+        if (!this.deck.getDiscardPile().isEmpty()) {
+            // if not empty, check the card against the discard pile
+            // otherwise, automatically play
+            if (!card.canPlayCard(this.deck.getDiscardCard())) {
+                return false;
+            }
+        }
+        
+        if (card.isReverse()) {
+            this.clockWise = !this.clockWise;
+        }
+        
+        if (card.isWildcard()) {
+            card.declareColor(declaredColor);
+        }
+        
+        // this moves the card to the discount pile
+        this.currentPlayer.removeCard(card);
+        this.deck.placeDiscardCard(card);
+        
+        // Find the next player to play
+        if (this.clockWise == true) {
+            // add to the next index
+            int nextPlayerIndex = this.currentPlayer.getPlayerIndex() + 1;
+            
+            nextPlayerIndex = nextPlayerIndex % this.numberOfPlayers;
+ 
+            if (card.isAddCard()) {
+                // we have to add a card to the next player even if there is a skip
+                Player nextPlayer = this.players.get(nextPlayerIndex);
+                nextPlayer.addNewCards(card.addCardsCount());
+            }
+            
+            if (card.isSkip()) {
+                nextPlayerIndex++;
+            }
+            
+            // if we exceed the total players, go back to 0 to get the next player
+            nextPlayerIndex = nextPlayerIndex % this.numberOfPlayers;
+
+            this.currentPlayer = this.players.get(nextPlayerIndex);
+        } else {
+            // subtract from the next index
+            int prevPlayerIndex = this.currentPlayer.getPlayerIndex() - 1;
+            
+            if (prevPlayerIndex < 0) {
+               // this means that the current player is 0
+               prevPlayerIndex = this.numberOfPlayers - 1;
+            }
+            
+            if (card.isAddCard()) {
+                // we have to add a card to the next player even if there is a skip
+                Player prevPlayer = this.players.get(prevPlayerIndex);
+                prevPlayer.addNewCards(card.addCardsCount());
+            }
+                                
+            if (card.isSkip()) {
+                if (prevPlayerIndex == 0) {
+                    prevPlayerIndex = this.numberOfPlayers - 1;
+                } else {
+                    prevPlayerIndex = prevPlayerIndex - 1;
+                }
+            }
+            
+            this.currentPlayer = this.players.get(prevPlayerIndex);
+        }
+        
+        return true;
     }
     
     public boolean isThereWinner() {
         for (int i = 0; i < numberOfPlayers; i++) {
-            if (getPlayerDeck(i).isEmpty()) {  // Check if a player has no cards left
-                winner = getThisPlayer(i); // Assign the winner
-                return true;  // Return immediately when a winner is found
+            if (getPlayerDeck(i).isEmpty()) { 
+                winner = getThisPlayer(i);
+                return true;
             }
         }
-        return false; // If no player has an empty deck, return false
+        return false;
     }
     
 
-    
-    public boolean isMoveLegal(){
-        return true;
-    }
     
     public ArrayList<Player> getPlayers(){
         return this.players;
@@ -111,7 +187,7 @@ public class Game {
         //Debug
 //        this.clockWise = false;
         //its always gonna be the previous one
-         this.previousPlayer = currentPlayer;
+        this.previousPlayer = currentPlayer;
         if(clockWise == true){
             this.currentPlayer = nextPlayer;
             // If the next index does exist, go back to the first person

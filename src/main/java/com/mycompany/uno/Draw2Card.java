@@ -4,29 +4,23 @@
  */
 package com.mycompany.uno;
 
+import java.awt.Image;
+
 /**
  *
  * @author chief
  */
-public class WildCard extends Card {
-    private String effect; // "Wild" or "Wild Draw Four"
-
-    public WildCard() {
-        super("Wild");
-        this.effect = "Wild";
-    }
-
-    public String getEffect() {
-        return effect;
-    }
-
-    public void setColor(String color) {
-        this.color = color;
-    }
-
-    @Override
+public class Draw2Card extends Card {
+    private String effect;
+    
+    public Draw2Card(String color, String effect){
+        super(color); 
+        this.effect = "draw 2";
+    }       
+    
+     @Override
     public String toString() {
-        return effect;
+        return color + " " + effect;
     }
     
     @Override
@@ -36,12 +30,12 @@ public class WildCard extends Card {
     
     @Override
     public boolean isReverse(){
-        return false;
+        return true;
     }
     
     @Override
     public boolean isSkip(){
-        return false;
+        return true;
     }
     
     @Override
@@ -51,7 +45,7 @@ public class WildCard extends Card {
 
     @Override
     public boolean isAddCard(){
-        return false;
+        return true;
     }
     
     @Override
@@ -61,10 +55,10 @@ public class WildCard extends Card {
     
     @Override
     public void declareColor(String color){
-        this.color = color;
+        
     }
     
     public String getImageName(){
-        return "wild_card.png";
+        return this.color + "_draw2.png";
     }
 }

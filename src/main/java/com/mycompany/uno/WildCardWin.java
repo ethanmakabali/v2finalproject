@@ -10,13 +10,16 @@ package com.mycompany.uno;
  */
 public class WildCardWin extends javax.swing.JFrame {
 
+    private String color;
+    
     /**
      * Creates new form WildCardWin
      */
     public WildCardWin() {
         initComponents();
+        this.color = color;
     }
-
+    
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -30,10 +33,10 @@ public class WildCardWin extends javax.swing.JFrame {
         jPanel1 = new javax.swing.JPanel();
         jLabel1 = new javax.swing.JLabel();
         jLabel2 = new javax.swing.JLabel();
-        jRadioButton1 = new javax.swing.JRadioButton();
-        jRadioButton2 = new javax.swing.JRadioButton();
-        jRadioButton3 = new javax.swing.JRadioButton();
-        jRadioButton4 = new javax.swing.JRadioButton();
+        radBlue = new javax.swing.JRadioButton();
+        radRed = new javax.swing.JRadioButton();
+        radGreen = new javax.swing.JRadioButton();
+        radYellow = new javax.swing.JRadioButton();
         jToggleButton1 = new javax.swing.JToggleButton();
         jButton1 = new javax.swing.JButton();
         jLabel3 = new javax.swing.JLabel();
@@ -49,35 +52,45 @@ public class WildCardWin extends javax.swing.JFrame {
         jLabel2.setFont(new java.awt.Font("Arial", 1, 14)); // NOI18N
         jLabel2.setText("Choose Color for the next player:");
 
-        jRadioButton1.setBackground(new java.awt.Color(51, 51, 255));
-        buttonGroup1.add(jRadioButton1);
-        jRadioButton1.setFont(new java.awt.Font("Arial Rounded MT Bold", 1, 18)); // NOI18N
-        jRadioButton1.setText("Blue");
-        jRadioButton1.setOpaque(true);
+        radBlue.setBackground(new java.awt.Color(51, 51, 255));
+        buttonGroup1.add(radBlue);
+        radBlue.setFont(new java.awt.Font("Arial Rounded MT Bold", 1, 18)); // NOI18N
+        radBlue.setText("Blue");
+        radBlue.setOpaque(true);
 
-        jRadioButton2.setBackground(new java.awt.Color(255, 0, 51));
-        buttonGroup1.add(jRadioButton2);
-        jRadioButton2.setFont(new java.awt.Font("Arial Rounded MT Bold", 1, 18)); // NOI18N
-        jRadioButton2.setText("RED");
-        jRadioButton2.setOpaque(true);
+        radRed.setBackground(new java.awt.Color(255, 0, 51));
+        buttonGroup1.add(radRed);
+        radRed.setFont(new java.awt.Font("Arial Rounded MT Bold", 1, 18)); // NOI18N
+        radRed.setText("RED");
+        radRed.setOpaque(true);
 
-        jRadioButton3.setBackground(new java.awt.Color(51, 255, 0));
-        buttonGroup1.add(jRadioButton3);
-        jRadioButton3.setFont(new java.awt.Font("Arial Rounded MT Bold", 1, 18)); // NOI18N
-        jRadioButton3.setText("Green");
-        jRadioButton3.setOpaque(true);
+        radGreen.setBackground(new java.awt.Color(51, 255, 0));
+        buttonGroup1.add(radGreen);
+        radGreen.setFont(new java.awt.Font("Arial Rounded MT Bold", 1, 18)); // NOI18N
+        radGreen.setText("Green");
+        radGreen.setOpaque(true);
 
-        jRadioButton4.setBackground(new java.awt.Color(255, 255, 51));
-        buttonGroup1.add(jRadioButton4);
-        jRadioButton4.setFont(new java.awt.Font("Arial Rounded MT Bold", 1, 18)); // NOI18N
-        jRadioButton4.setText("Yellow");
-        jRadioButton4.setOpaque(true);
+        radYellow.setBackground(new java.awt.Color(255, 255, 51));
+        buttonGroup1.add(radYellow);
+        radYellow.setFont(new java.awt.Font("Arial Rounded MT Bold", 1, 18)); // NOI18N
+        radYellow.setText("Yellow");
+        radYellow.setOpaque(true);
 
         jToggleButton1.setFont(new java.awt.Font("Arial Rounded MT Bold", 1, 14)); // NOI18N
         jToggleButton1.setText("Confirm");
+        jToggleButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jToggleButton1ActionPerformed(evt);
+            }
+        });
 
         jButton1.setFont(new java.awt.Font("Arial Rounded MT Bold", 1, 14)); // NOI18N
         jButton1.setText("Cancel");
+        jButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton1ActionPerformed(evt);
+            }
+        });
 
         jLabel3.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
         jLabel3.setText("I want to choose a different card:");
@@ -99,7 +112,7 @@ public class WildCardWin extends javax.swing.JFrame {
                         .addComponent(jLabel2))
                     .addGroup(jPanel1Layout.createSequentialGroup()
                         .addGap(212, 212, 212)
-                        .addComponent(jRadioButton2, javax.swing.GroupLayout.PREFERRED_SIZE, 173, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addComponent(radRed, javax.swing.GroupLayout.PREFERRED_SIZE, 173, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addGroup(jPanel1Layout.createSequentialGroup()
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(jPanel1Layout.createSequentialGroup()
@@ -115,11 +128,11 @@ public class WildCardWin extends javax.swing.JFrame {
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                             .addComponent(jLabel4)
                             .addGroup(jPanel1Layout.createSequentialGroup()
-                                .addComponent(jRadioButton4, javax.swing.GroupLayout.PREFERRED_SIZE, 173, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addComponent(radYellow, javax.swing.GroupLayout.PREFERRED_SIZE, 173, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addComponent(jRadioButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 173, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                                .addComponent(radBlue, javax.swing.GroupLayout.PREFERRED_SIZE, 173, javax.swing.GroupLayout.PREFERRED_SIZE)))
                         .addGap(18, 18, 18)
-                        .addComponent(jRadioButton3, javax.swing.GroupLayout.PREFERRED_SIZE, 173, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addComponent(radGreen, javax.swing.GroupLayout.PREFERRED_SIZE, 173, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addContainerGap(47, Short.MAX_VALUE))
         );
         jPanel1Layout.setVerticalGroup(
@@ -130,11 +143,11 @@ public class WildCardWin extends javax.swing.JFrame {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(jLabel2)
                 .addGap(18, 18, 18)
-                .addComponent(jRadioButton2, javax.swing.GroupLayout.PREFERRED_SIZE, 81, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(radRed, javax.swing.GroupLayout.PREFERRED_SIZE, 81, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 8, Short.MAX_VALUE)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                     .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addComponent(jRadioButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 81, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(radBlue, javax.swing.GroupLayout.PREFERRED_SIZE, 81, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(20, 20, 20)
                         .addComponent(jLabel4)
                         .addGap(18, 18, 18)
@@ -147,8 +160,8 @@ public class WildCardWin extends javax.swing.JFrame {
                         .addGap(16, 16, 16))
                     .addGroup(jPanel1Layout.createSequentialGroup()
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(jRadioButton3, javax.swing.GroupLayout.PREFERRED_SIZE, 81, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jRadioButton4, javax.swing.GroupLayout.PREFERRED_SIZE, 81, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addComponent(radGreen, javax.swing.GroupLayout.PREFERRED_SIZE, 81, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(radYellow, javax.swing.GroupLayout.PREFERRED_SIZE, 81, javax.swing.GroupLayout.PREFERRED_SIZE))
                         .addGap(198, 198, 198))))
         );
 
@@ -165,6 +178,28 @@ public class WildCardWin extends javax.swing.JFrame {
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
+
+    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+        // TODO add your handling code here:
+        this.dispose();
+    }//GEN-LAST:event_jButton1ActionPerformed
+
+    private void jToggleButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jToggleButton1ActionPerformed
+        // TODO add your handling code here:
+        if(radYellow.isSelected()){
+           this.color = "yellow";
+        }
+        if(radGreen.isSelected()){
+           this.color = "green";
+        }
+        if(radRed.isSelected()){
+           this.color = "red";
+        }
+        if(radBlue.isSelected()){
+           this.color = "blue";
+        }
+        this.dispose();
+    }//GEN-LAST:event_jToggleButton1ActionPerformed
 
     /**
      * @param args the command line arguments
@@ -209,10 +244,10 @@ public class WildCardWin extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JPanel jPanel1;
-    private javax.swing.JRadioButton jRadioButton1;
-    private javax.swing.JRadioButton jRadioButton2;
-    private javax.swing.JRadioButton jRadioButton3;
-    private javax.swing.JRadioButton jRadioButton4;
     private javax.swing.JToggleButton jToggleButton1;
+    private javax.swing.JRadioButton radBlue;
+    private javax.swing.JRadioButton radGreen;
+    private javax.swing.JRadioButton radRed;
+    private javax.swing.JRadioButton radYellow;
     // End of variables declaration//GEN-END:variables
 }
