@@ -8,30 +8,32 @@ package com.mycompany.uno;
  *
  * @author chief
  */
-public class WildCard extends Card {
-    private String effect; // "Wild" or "Wild Draw Four"
-
-    public WildCard() {
-        super("Wild");
-        this.effect = "Wild";
+public class SkipCard extends Card{
+    private String effect;
+    
+    
+    public SkipCard(String color, String effect){
+        super(color);
+        this.effect = effect;
     }
-
-    public String getEffect() {
-        return effect;
-    }
-
-    public void setColor(String color) {
-        this.color = color;
-    }
-
+    
     @Override
     public String toString() {
-        return effect;
+        return color + " " + effect;
     }
     
     @Override
     public boolean canPlayCard(Card currentCard){
-        return true;
+        
+        if (currentCard.getColor() == this.color) {
+            return true;
+        }
+        
+        if(currentCard instanceof SkipCard){
+            return true;
+        }
+        
+        return false;
     }
     
     @Override
@@ -41,12 +43,12 @@ public class WildCard extends Card {
     
     @Override
     public boolean isSkip(){
-        return false;
+        return true;
     }
     
     @Override
     public boolean isWildcard(){
-        return true;
+        return false;
     }
 
     @Override
@@ -61,10 +63,10 @@ public class WildCard extends Card {
     
     @Override
     public void declareColor(String color){
-        this.color = color;
+        // nothing
     }
     
     public String getImageName(){
-        return "wild_card.png";
+        return this.color + "_skip.png";
     }
 }

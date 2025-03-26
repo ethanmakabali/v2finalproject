@@ -18,19 +18,18 @@ public class Player {
     private Player previousPlayer;
     private Player nextPlayer;
     private int numberOfPlayers;
-    private ArrayList<Card> mainPile;
+    private Deck deck;
     
-    
-    public Player(String playerName, int playerNumber, int numberOfPlayers, ArrayList<Card> mainPile){
+    public Player(String playerName, int playerNumber, int numberOfPlayers, Deck deck){
         this.playerNumber = playerNumber;
         this.playerName = playerName;
         this.numberOfPlayers = numberOfPlayers;
         this.cards = new ArrayList<Card>();
-        this.mainPile = mainPile;
-        generateRandomDecks();
+        this.deck = deck;
+        this.generateRandomDecks();
         //debug
         System.out.println("Player " + this.playerNumber + "(" + this.playerName + ")" +  ": " + this.cards);
-        System.out.println("Number of cards in main pile: " + mainPile.size());
+        System.out.println("Number of cards in main pile: " + deck.getMainPile().size());
 //        System.out.println(this.playerNumber);
 //        System.out.println(this.cards);
     }
@@ -47,9 +46,36 @@ public class Player {
     
     public void generateRandomDecks(){
         // Simulate the drawing pattern, alternates
+        
         for(int i = 0; i < 7; i++){
-            Card card = mainPile.get(i);
-            mainPile.remove(i);
+            Card card = this.deck.getNextMainPileCard();
+            this.cards.add(card);
+        }
+    }
+    
+    public int getPlayerNumber() {
+        return this.playerNumber;
+    }
+    
+    public int getPlayerIndex() {
+        return this.playerNumber - 1;
+    }
+    
+    public void removeCard(Card removeCard) {
+        for (int i = 0; i < this.cards.size(); i++) {
+            if (this.cards.get(i) == removeCard) {
+                // removing the card
+                this.cards.remove(i);
+            }
+        }
+    }
+    
+    public void addNewCards(int totalCards) {
+        //
+        // This adds additional cards to the deck
+        //
+        for(int i = 0; i < totalCards; i++){
+            Card card = this.deck.getNextMainPileCard();
             this.cards.add(card);
         }
     }

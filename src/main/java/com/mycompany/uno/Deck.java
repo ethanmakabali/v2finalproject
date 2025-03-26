@@ -29,7 +29,6 @@ public class Deck {
         String[] colors = {"Red","Green","Blue","Yellow"};
         String[] values = {"1", "2", "3", "4","5", "6", "7", "8","9"};
         String[] actions = {"Skip","Reverse","Draw Two"};
-        String[] wildCards = {"Wild Card","Wild Card Draw 4"};
         // there are only one 0 card for each color
         for(String color : colors){
             mainPile.add(new NumberCard(color, "0"));
@@ -43,17 +42,17 @@ public class Deck {
         }
         // Add each action card twice to the deck
         for(String color : colors){
-            for(String action : actions){
-                mainPile.add(new ActionCard(color, action));
-                mainPile.add(new ActionCard(color, action));
-            }
+            mainPile.add(new SkipCard(color, actions[0]));
+            mainPile.add(new SkipCard(color, actions[0]));
+            mainPile.add(new ReverseCard(color, actions[1]));
+            mainPile.add(new ReverseCard(color, actions[1]));
+            mainPile.add(new Draw2Card(color, actions[2]));
+            mainPile.add(new Draw2Card(color, actions[2]));
         }
         // Add 4 Wild Cards and 4 Wild Card Add four cards
-        for(String wc : wildCards){
-            mainPile.add(new WildCard(wc));
-            mainPile.add(new WildCard(wc));
-            mainPile.add(new WildCard(wc));
-            mainPile.add(new WildCard(wc));
+        for (int i = 0; i < 4; i++) {
+            mainPile.add(new WildCard());
+            mainPile.add(new WildDraw4Card());
         }
     }
     
@@ -69,6 +68,24 @@ public class Deck {
         return this.discardPile;
     }
     
+    public Card getDiscardCard() {
+        if (this.discardPile.isEmpty()){
+            this.discardPile.add(this.mainPile.get(0));
+            mainPile.remove(0);
+        }
+        return this.discardPile.get(this.discardPile.size() - 1);
+    }
+    
+    public void placeDiscardCard(Card card) {
+        this.discardPile.add(card);
+    }
+    
+    public Card getNextMainPileCard() {
+        Card card = mainPile.get(0);
+        mainPile.remove(0);
+            
+        return card;
+    }
     
 }
 
