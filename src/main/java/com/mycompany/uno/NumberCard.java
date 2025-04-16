@@ -26,27 +26,26 @@ public class NumberCard extends Card {
         return getColor() + " " + getNumber();
     }
     
+    @Override
     public boolean canPlayCard(Card currentCard) {
-        
         if (currentCard.isWildcard()) {
-            // TODO: this is necessary until the wildcard feature is working
+            return this.color.equalsIgnoreCase(currentCard.getColor());
+        }
+
+        if (currentCard.getColor().equalsIgnoreCase(this.color)) {
             return true;
         }
-        
-        if (currentCard.getColor() == this.color) {
-            return true;
-        }
-        
+
         if (currentCard instanceof NumberCard) {
             NumberCard numberCard = (NumberCard) currentCard;
-            
-            if (numberCard.getNumber() == this.number) {
+            if (numberCard.getNumber().equals(this.number)) {
                 return true;
             }
         }
-        
+
         return false;
     }
+
     
     public boolean isReverse() {
         return false;

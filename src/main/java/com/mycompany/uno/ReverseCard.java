@@ -22,9 +22,22 @@ public class ReverseCard extends Card{
     }
     
     @Override
-    public boolean canPlayCard(Card currentCard){
-        return true;
+    public boolean canPlayCard(Card currentCard) {
+        if (currentCard.isWildcard()) {
+            return this.color.equalsIgnoreCase(currentCard.getColor());
+        }
+
+        if (currentCard.getColor().equalsIgnoreCase(this.color)) {
+            return true;
+        }
+
+        if (currentCard instanceof ReverseCard) {
+            return true;
+        }
+
+        return false;
     }
+
     
     @Override
     public boolean isReverse(){
@@ -38,7 +51,7 @@ public class ReverseCard extends Card{
     
     @Override
     public boolean isWildcard(){
-        return true;
+        return false;
     }
 
     @Override

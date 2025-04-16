@@ -23,18 +23,22 @@ public class SkipCard extends Card{
     }
     
     @Override
-    public boolean canPlayCard(Card currentCard){
-        
-        if (currentCard.getColor() == this.color) {
+    public boolean canPlayCard(Card currentCard) {
+        if (currentCard.isWildcard()) {
+            return this.color.equalsIgnoreCase(currentCard.getColor());
+        }
+
+        if (currentCard.getColor().equalsIgnoreCase(this.color)) {
             return true;
         }
-        
-        if(currentCard instanceof SkipCard){
+
+        if (currentCard instanceof SkipCard) {
             return true;
         }
-        
+
         return false;
     }
+
     
     @Override
     public boolean isReverse(){

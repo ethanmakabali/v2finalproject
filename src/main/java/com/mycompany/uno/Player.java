@@ -35,6 +35,11 @@ public class Player {
     }
    
     
+    public String getName() {
+        return this.playerName; // Assuming you have a 'name' field
+    }
+
+    
     public int getCurrentPlayerDeckSize(){
         int size = this.cards.size();
         return size;

@@ -28,12 +28,12 @@ public class WildDraw4Card extends Card {
     
     @Override
     public boolean isReverse(){
-        return true;
+        return false;
     }
     
     @Override
     public boolean isSkip(){
-        return true;
+        return false;
     }
     
     @Override

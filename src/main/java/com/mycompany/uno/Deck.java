@@ -83,9 +83,7 @@ public class Deck {
     public Card getNextMainPileCard() {
         Card card = mainPile.get(0);
         mainPile.remove(0);
-            
         return card;
     }
-    
 }
 

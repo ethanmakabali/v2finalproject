@@ -12,7 +12,6 @@ import java.util.ArrayList;
  * @author chief
  */
 public class Game {
-    private ArrayList<Integer> turns;
     private int numberOfPlayers;
     private int turn;
     
@@ -31,7 +30,6 @@ public class Game {
     
     public Game(ArrayList<String> playerNames, Deck deck){
         this.deck = deck;
-        this.turns = new ArrayList<>();
         this.players = new ArrayList<>();
         this.numberOfPlayers = playerNames.size();
         this.playerNames = playerNames;
@@ -65,82 +63,38 @@ public class Game {
         return this.currentPlayer.getCurrentPlayerDeck();
     }
     
-    public boolean playCard(Player player, Card card, String declaredColor) {
-        if (this.currentPlayer != player) {
-            // Reset the game to this player
-            System.err.println("The current player doesn't match incoming player");
-            this.currentPlayer = player;
-        }
-        
+    public boolean playCard(Card card, String declaredColor) {
         if (!this.deck.getDiscardPile().isEmpty()) {
-            // if not empty, check the card against the discard pile
-            // otherwise, automatically play
             if (!card.canPlayCard(this.deck.getDiscardCard())) {
                 return false;
             }
         }
-        
+
         if (card.isReverse()) {
             this.clockWise = !this.clockWise;
         }
-        
+
         if (card.isWildcard()) {
             card.declareColor(declaredColor);
         }
-        
-        // this moves the card to the discount pile
+
         this.currentPlayer.removeCard(card);
         this.deck.placeDiscardCard(card);
-        
-        // Find the next player to play
-        if (this.clockWise == true) {
-            // add to the next index
-            int nextPlayerIndex = this.currentPlayer.getPlayerIndex() + 1;
-            
-            nextPlayerIndex = nextPlayerIndex % this.numberOfPlayers;
- 
-            if (card.isAddCard()) {
-                // we have to add a card to the next player even if there is a skip
-                Player nextPlayer = this.players.get(nextPlayerIndex);
-                nextPlayer.addNewCards(card.addCardsCount());
-            }
-            
-            if (card.isSkip()) {
-                nextPlayerIndex++;
-            }
-            
-            // if we exceed the total players, go back to 0 to get the next player
-            nextPlayerIndex = nextPlayerIndex % this.numberOfPlayers;
 
-            this.currentPlayer = this.players.get(nextPlayerIndex);
+        if (card.isAddCard()) {
+            moveToNextPlayer();
+            this.currentPlayer.addNewCards(card.addCardsCount());
+            moveToNextPlayer();
+        } else if (card.isSkip()) {
+            moveToNextPlayer();
+            moveToNextPlayer();
         } else {
-            // subtract from the next index
-            int prevPlayerIndex = this.currentPlayer.getPlayerIndex() - 1;
-            
-            if (prevPlayerIndex < 0) {
-               // this means that the current player is 0
-               prevPlayerIndex = this.numberOfPlayers - 1;
-            }
-            
-            if (card.isAddCard()) {
-                // we have to add a card to the next player even if there is a skip
-                Player prevPlayer = this.players.get(prevPlayerIndex);
-                prevPlayer.addNewCards(card.addCardsCount());
-            }
-                                
-            if (card.isSkip()) {
-                if (prevPlayerIndex == 0) {
-                    prevPlayerIndex = this.numberOfPlayers - 1;
-                } else {
-                    prevPlayerIndex = prevPlayerIndex - 1;
-                }
-            }
-            
-            this.currentPlayer = this.players.get(prevPlayerIndex);
+            moveToNextPlayer();
         }
-        
+
         return true;
     }
+
     
     public boolean isThereWinner() {
         for (int i = 0; i < numberOfPlayers; i++) {
@@ -233,25 +187,5 @@ public class Game {
     public void setNumberOfPlayers(int numPlayers){
         this.numberOfPlayers = numPlayers;
     }
-    
-    
-    
-    private void nextPlayersTurn(){
-        for(int i = 1; i < turns.size()+1; i++){
-            // If the the player in the arraylist is about of bounce, go back to the first player
-            if(turn == turns.get(i) && turns.get(i+1) == null){
-                turn = 1;
-            }
-            if(turn == turns.get(i)){
-                turn = turn + 1;
-            }
-        }
     }
     
-    private void setTurns(){
-        //Example: {1,2,3,4}
-        for(int i=1; i < numberOfPlayers+1; i++){
-            this.turns.add(i);
-        }
-    }
-}

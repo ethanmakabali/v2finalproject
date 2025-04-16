@@ -24,23 +24,36 @@ public class Draw2Card extends Card {
     }
     
     @Override
-    public boolean canPlayCard(Card currentCard){
-        return true;
+    public boolean canPlayCard(Card currentCard) {
+        if (currentCard.isWildcard()) {
+            return this.color.equalsIgnoreCase(currentCard.getColor());
+        }
+
+        if (currentCard.getColor().equalsIgnoreCase(this.color)) {
+            return true;
+        }
+
+        if (currentCard instanceof Draw2Card) {
+            return true;
+        }
+
+        return false;
     }
+
     
     @Override
     public boolean isReverse(){
-        return true;
+        return false;
     }
     
     @Override
     public boolean isSkip(){
-        return true;
+        return false;
     }
     
     @Override
     public boolean isWildcard(){
-        return true;
+        return false;
     }
 
     @Override
@@ -50,7 +63,7 @@ public class Draw2Card extends Card {
     
     @Override
     public int addCardsCount(){
-        return 0;
+        return 2;
     }
     
     @Override

@@ -63,7 +63,7 @@ public class LiveGameWin extends javax.swing.JFrame {
                 
         initializeFaceDownCards();
         initializeBtnCardSlots();
-        turnOnNoMovesPanel(true);
+        
         this.numberOfPlayers = numberOfPlayers;
         System.out.println("Creating object");
         this.deck = new Deck();
@@ -75,6 +75,7 @@ public class LiveGameWin extends javax.swing.JFrame {
         updatePlayerCards();
         // deck.getDiscardCard(); // initialize first card
         lblCurrentPlayer.setText("Current player " + game.getCurrentPlayer());
+        lblNextPlayer.setText("On Deck: " + game.getNextPlayer().getName());
         
         //ChatGPT this part:
         if (false) {
@@ -127,6 +128,7 @@ public class LiveGameWin extends javax.swing.JFrame {
                 btnCardSlots.get(i).setVisible(false);
             }
         }
+        checkPlayerMoves();
     }
 
     
@@ -291,18 +293,38 @@ public class LiveGameWin extends javax.swing.JFrame {
         pnlPlayer4FaceDownCards.setVisible(false);
     }
     
-    // turning off windows
-    private void turnOnNoMovesPanel(boolean isVisible){
-        pnlNoMoves.setVisible(isVisible);
-    }
     
-    
-    // create new window
     private void createHideCardsWindow(){
         HideCardsWin hideCards = new HideCardsWin();
         hideCards.setVisible(true);
     }
     
+    private boolean hasLegalMove() {
+        if (deck.getDiscardPile().isEmpty()) {
+            return true;
+        }
+
+        ArrayList<Card> playerHand = game.getCurrentPlayerDeck();
+        Card topCard = deck.getDiscardCard();
+
+        for (Card card : playerHand) {
+            if (card.canPlayCard(topCard)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private void checkPlayerMoves() {
+        Player currentPlayer = game.getCurrentPlayer();
+        NoLegalMovesWin nlmw = new NoLegalMovesWin(currentPlayer);
+        if (!hasLegalMove()) {
+            nlmw.setVisible(true);
+        } else {
+            nlmw.setVisible(false);
+        }
+    }
+
     
     private void playCard(int cardIndex){
         Card playerCard = game.getCurrentPlayerDeck().get(cardIndex - 1);
@@ -318,16 +340,16 @@ public class LiveGameWin extends javax.swing.JFrame {
             wildCardWin.setVisible(true);
         }
         
-        if (game.playCard(currentPlayer, playerCard, declaredColor) == true){
-//            discardPile.add(playerCard);
+        if (game.playCard(playerCard, declaredColor) == true){
+            discardPile.add(playerCard);
 //            game.getCurrentPlayerDeck().remove(cardIndex - 1);
             System.out.println("You played this card: " + playerCard);
             int size = game.getCurrentPlayerDeck().size();
             System.out.println("Your deck now contains " + size + " elements");
             setFaceDownCards();
-//            game.moveToNextPlayer();
             updatePlayerCards();
-            lblCurrentPlayer.setText("Current Player " + currentPlayer);
+            lblCurrentPlayer.setText("Current Player: " + game.getCurrentPlayer().getName());
+            lblNextPlayer.setText("On Deck: " + game.getNextPlayer().getName());
             System.out.println("The current player is: " + currentPlayer);
             nextStep = true;
             
@@ -343,6 +365,7 @@ public class LiveGameWin extends javax.swing.JFrame {
                 Image scaledImage = originalIcon.getImage().getScaledInstance(324, 380, Image.SCALE_SMOOTH);
                 ImageIcon resizedIcon = new ImageIcon(scaledImage);
                 ImageHolder.setIcon(resizedIcon);
+//                createHideCardsWindow();
             } else {
                 System.err.println("Image not found: /" + imageName);
                 ImageHolder.setIcon(null); // fallback
@@ -350,7 +373,7 @@ public class LiveGameWin extends javax.swing.JFrame {
 
         }
         
-        else if(game.playCard(currentPlayer, playerCard, declaredColor) == false){
+        else if(game.playCard(playerCard, declaredColor) == false){
             JOptionPane.showMessageDialog(null, "Please play a legal move", "Invalid Move", JOptionPane.INFORMATION_MESSAGE);
         }
         
@@ -498,12 +521,9 @@ public class LiveGameWin extends javax.swing.JFrame {
         btnForfeit = new javax.swing.JButton();
         jButton2 = new javax.swing.JButton();
         btnQuitGame = new javax.swing.JButton();
-        pnlNoMoves = new javax.swing.JPanel();
-        jLabel4 = new javax.swing.JLabel();
-        jLabel5 = new javax.swing.JLabel();
-        jLabel6 = new javax.swing.JLabel();
         jLabel3 = new javax.swing.JLabel();
         lblCurrentPlayer = new javax.swing.JLabel();
+        lblNextPlayer = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -1295,50 +1315,14 @@ public class LiveGameWin extends javax.swing.JFrame {
                 .addContainerGap())
         );
 
-        pnlNoMoves.setBackground(new java.awt.Color(153, 255, 153));
-
-        jLabel4.setFont(new java.awt.Font("Arial Rounded MT Bold", 1, 14)); // NOI18N
-        jLabel4.setForeground(new java.awt.Color(255, 51, 51));
-        jLabel4.setText("You don't have any available moves!");
-
-        jLabel5.setFont(new java.awt.Font("Arial Rounded MT Bold", 1, 14)); // NOI18N
-        jLabel5.setForeground(new java.awt.Color(255, 51, 51));
-        jLabel5.setText("Drawing a new card in:");
-
-        jLabel6.setFont(new java.awt.Font("Arial Rounded MT Bold", 1, 18)); // NOI18N
-        jLabel6.setForeground(new java.awt.Color(204, 0, 204));
-        jLabel6.setText("5");
-
-        javax.swing.GroupLayout pnlNoMovesLayout = new javax.swing.GroupLayout(pnlNoMoves);
-        pnlNoMoves.setLayout(pnlNoMovesLayout);
-        pnlNoMovesLayout.setHorizontalGroup(
-            pnlNoMovesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(pnlNoMovesLayout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(pnlNoMovesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(pnlNoMovesLayout.createSequentialGroup()
-                        .addComponent(jLabel5)
-                        .addGap(30, 30, 30)
-                        .addComponent(jLabel6, javax.swing.GroupLayout.PREFERRED_SIZE, 27, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addComponent(jLabel4))
-                .addContainerGap(28, Short.MAX_VALUE))
-        );
-        pnlNoMovesLayout.setVerticalGroup(
-            pnlNoMovesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(pnlNoMovesLayout.createSequentialGroup()
-                .addComponent(jLabel4, javax.swing.GroupLayout.PREFERRED_SIZE, 29, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(pnlNoMovesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel5)
-                    .addComponent(jLabel6))
-                .addGap(0, 12, Short.MAX_VALUE))
-        );
-
         jLabel3.setFont(new java.awt.Font("Arial Rounded MT Bold", 1, 24)); // NOI18N
         jLabel3.setText("Current Card:");
 
-        lblCurrentPlayer.setFont(new java.awt.Font("Arial Rounded MT Bold", 1, 14)); // NOI18N
+        lblCurrentPlayer.setFont(new java.awt.Font("Arial Rounded MT Bold", 1, 18)); // NOI18N
         lblCurrentPlayer.setText("Current Player");
+
+        lblNextPlayer.setFont(new java.awt.Font("Arial Rounded MT Bold", 1, 18)); // NOI18N
+        lblNextPlayer.setText("On Deck:");
 
         javax.swing.GroupLayout pnlLiveGameLayout = new javax.swing.GroupLayout(pnlLiveGame);
         pnlLiveGame.setLayout(pnlLiveGameLayout);
@@ -1355,16 +1339,16 @@ public class LiveGameWin extends javax.swing.JFrame {
                                 .addGap(6, 6, 6)
                                 .addComponent(jLabel7, javax.swing.GroupLayout.PREFERRED_SIZE, 173, javax.swing.GroupLayout.PREFERRED_SIZE))))
                     .addGroup(pnlLiveGameLayout.createSequentialGroup()
-                        .addGap(14, 14, 14)
-                        .addComponent(lblCurrentPlayer, javax.swing.GroupLayout.PREFERRED_SIZE, 161, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(pnlLiveGameLayout.createSequentialGroup()
                         .addContainerGap()
-                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 309, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 309, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(pnlLiveGameLayout.createSequentialGroup()
+                        .addGap(14, 14, 14)
+                        .addGroup(pnlLiveGameLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(lblNextPlayer, javax.swing.GroupLayout.PREFERRED_SIZE, 277, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(lblCurrentPlayer, javax.swing.GroupLayout.PREFERRED_SIZE, 277, javax.swing.GroupLayout.PREFERRED_SIZE))))
                 .addGroup(pnlLiveGameLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(pnlLiveGameLayout.createSequentialGroup()
-                        .addGroup(pnlLiveGameLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                            .addComponent(pnlNoMoves, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jLabel1))
+                        .addComponent(jLabel1)
                         .addGap(0, 0, Short.MAX_VALUE))
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, pnlLiveGameLayout.createSequentialGroup()
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
@@ -1400,8 +1384,7 @@ public class LiveGameWin extends javax.swing.JFrame {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(pnlLiveGameLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(pnlLiveGameLayout.createSequentialGroup()
-                        .addComponent(pnlNoMoves, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGap(74, 74, 74)
                         .addComponent(jLabel3)
                         .addGap(21, 21, 21)
                         .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
@@ -1412,7 +1395,9 @@ public class LiveGameWin extends javax.swing.JFrame {
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 461, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(27, 27, 27)
-                        .addComponent(lblCurrentPlayer, javax.swing.GroupLayout.PREFERRED_SIZE, 34, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addComponent(lblCurrentPlayer, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(lblNextPlayer, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
@@ -1462,7 +1447,6 @@ public class LiveGameWin extends javax.swing.JFrame {
 
     private void btnCardSlot1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCardSlot1ActionPerformed
         // TODO add your handling code here:
-//        createHideCardsWindow();
         playCard(1);
         int mainPileSize = deck.getMainPile().size();
         System.out.println("The main pile now has " + mainPileSize);
@@ -1645,9 +1629,6 @@ public class LiveGameWin extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
-    private javax.swing.JLabel jLabel4;
-    private javax.swing.JLabel jLabel5;
-    private javax.swing.JLabel jLabel6;
     private javax.swing.JLabel jLabel7;
     private javax.swing.JLabel jLabel8;
     private javax.swing.JPanel jPanel2;
@@ -1656,6 +1637,7 @@ public class LiveGameWin extends javax.swing.JFrame {
     private javax.swing.JPanel jPanel85;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JLabel lblCurrentPlayer;
+    private javax.swing.JLabel lblNextPlayer;
     private javax.swing.JLabel lblPlayer1FaceDownCards;
     private javax.swing.JLabel lblPlayer1FaceDownCardsCount;
     private javax.swing.JLabel lblPlayer2FaceDownCards;
@@ -1665,7 +1647,6 @@ public class LiveGameWin extends javax.swing.JFrame {
     private javax.swing.JLabel lblPlayer4FaceDownCards;
     private javax.swing.JLabel lblPlayer4FaceDownCardsCount;
     private javax.swing.JPanel pnlLiveGame;
-    private javax.swing.JPanel pnlNoMoves;
     private javax.swing.JPanel pnlPlayer1FaceDownCards;
     private javax.swing.JPanel pnlPlayer2FaceDownCards;
     private javax.swing.JPanel pnlPlayer3FaceDownCards;
