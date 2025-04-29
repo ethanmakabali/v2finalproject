@@ -46,7 +46,7 @@ public class ReverseCard extends Card{
     
     @Override
     public boolean isSkip(){
-        return true;
+        return false;
     }
     
     @Override
@@ -56,7 +56,7 @@ public class ReverseCard extends Card{
 
     @Override
     public boolean isAddCard(){
-        return true;
+        return false;
     }
     
     @Override

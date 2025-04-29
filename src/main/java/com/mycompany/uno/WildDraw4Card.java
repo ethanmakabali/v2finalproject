@@ -33,7 +33,7 @@ public class WildDraw4Card extends Card {
     
     @Override
     public boolean isSkip(){
-        return false;
+        return true;
     }
     
     @Override

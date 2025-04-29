@@ -4,22 +4,25 @@
  */
 package com.mycompany.uno;
 
+import javax.swing.JFrame;
+import javax.swing.JOptionPane;
+
 /**
  *
  * @author chief
  */
-public class WildCardWin extends javax.swing.JFrame {
+public class WildCardWin extends JFrame {
 
-    private String color;
+    public static String selectedColor = null;
     
     /**
      * Creates new form WildCardWin
      */
     public WildCardWin() {
         initComponents();
-        this.color = color;
     }
     
+   
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -37,8 +40,8 @@ public class WildCardWin extends javax.swing.JFrame {
         radRed = new javax.swing.JRadioButton();
         radGreen = new javax.swing.JRadioButton();
         radYellow = new javax.swing.JRadioButton();
-        jToggleButton1 = new javax.swing.JToggleButton();
-        jButton1 = new javax.swing.JButton();
+        btnConfirm = new javax.swing.JToggleButton();
+        btnCancel = new javax.swing.JButton();
         jLabel3 = new javax.swing.JLabel();
         jLabel4 = new javax.swing.JLabel();
 
@@ -76,19 +79,19 @@ public class WildCardWin extends javax.swing.JFrame {
         radYellow.setText("Yellow");
         radYellow.setOpaque(true);
 
-        jToggleButton1.setFont(new java.awt.Font("Arial Rounded MT Bold", 1, 14)); // NOI18N
-        jToggleButton1.setText("Confirm");
-        jToggleButton1.addActionListener(new java.awt.event.ActionListener() {
+        btnConfirm.setFont(new java.awt.Font("Arial Rounded MT Bold", 1, 14)); // NOI18N
+        btnConfirm.setText("Confirm");
+        btnConfirm.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jToggleButton1ActionPerformed(evt);
+                btnConfirmActionPerformed(evt);
             }
         });
 
-        jButton1.setFont(new java.awt.Font("Arial Rounded MT Bold", 1, 14)); // NOI18N
-        jButton1.setText("Cancel");
-        jButton1.addActionListener(new java.awt.event.ActionListener() {
+        btnCancel.setFont(new java.awt.Font("Arial Rounded MT Bold", 1, 14)); // NOI18N
+        btnCancel.setText("Cancel");
+        btnCancel.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton1ActionPerformed(evt);
+                btnCancelActionPerformed(evt);
             }
         });
 
@@ -117,12 +120,12 @@ public class WildCardWin extends javax.swing.JFrame {
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(jPanel1Layout.createSequentialGroup()
                                 .addGap(14, 14, 14)
-                                .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 90, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addComponent(btnCancel, javax.swing.GroupLayout.PREFERRED_SIZE, 90, javax.swing.GroupLayout.PREFERRED_SIZE))
                             .addGroup(jPanel1Layout.createSequentialGroup()
                                 .addContainerGap()
                                 .addComponent(jLabel3)))
                         .addGap(52, 52, 52)
-                        .addComponent(jToggleButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 130, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addComponent(btnConfirm, javax.swing.GroupLayout.PREFERRED_SIZE, 130, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addGroup(jPanel1Layout.createSequentialGroup()
                         .addGap(26, 26, 26)
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
@@ -152,11 +155,11 @@ public class WildCardWin extends javax.swing.JFrame {
                         .addComponent(jLabel4)
                         .addGap(18, 18, 18)
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jToggleButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 53, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(btnConfirm, javax.swing.GroupLayout.PREFERRED_SIZE, 53, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addGroup(jPanel1Layout.createSequentialGroup()
                                 .addComponent(jLabel3)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                                .addComponent(btnCancel, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE)))
                         .addGap(16, 16, 16))
                     .addGroup(jPanel1Layout.createSequentialGroup()
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
@@ -179,27 +182,32 @@ public class WildCardWin extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+    private void btnCancelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCancelActionPerformed
         // TODO add your handling code here:
         this.dispose();
-    }//GEN-LAST:event_jButton1ActionPerformed
+    }//GEN-LAST:event_btnCancelActionPerformed
 
-    private void jToggleButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jToggleButton1ActionPerformed
+    private void btnConfirmActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnConfirmActionPerformed
         // TODO add your handling code here:
         if(radYellow.isSelected()){
-           this.color = "yellow";
+           selectedColor = "yellow";
         }
         if(radGreen.isSelected()){
-           this.color = "green";
+           selectedColor = "green";
         }
         if(radRed.isSelected()){
-           this.color = "red";
+           selectedColor = "red";
         }
         if(radBlue.isSelected()){
-           this.color = "blue";
+           selectedColor = "blue";
         }
-        this.dispose();
-    }//GEN-LAST:event_jToggleButton1ActionPerformed
+        if (WildCardWin.selectedColor == null) {
+            JOptionPane.showMessageDialog(null, "Please select a color!!!");
+        }
+        if (WildCardWin.selectedColor != null) {
+            this.dispose();
+        }
+    }//GEN-LAST:event_btnConfirmActionPerformed
 
     /**
      * @param args the command line arguments
@@ -237,14 +245,14 @@ public class WildCardWin extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton btnCancel;
+    private javax.swing.JToggleButton btnConfirm;
     private javax.swing.ButtonGroup buttonGroup1;
-    private javax.swing.JButton jButton1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JPanel jPanel1;
-    private javax.swing.JToggleButton jToggleButton1;
     private javax.swing.JRadioButton radBlue;
     private javax.swing.JRadioButton radGreen;
     private javax.swing.JRadioButton radRed;

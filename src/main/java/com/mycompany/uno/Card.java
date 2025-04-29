@@ -34,7 +34,4 @@ public abstract class Card {
     public abstract void declareColor(String color);
     
     public abstract String getImageName();
-    
-//    public abstract int totalCards();
-    
 }

@@ -13,42 +13,43 @@ import java.util.ArrayList;
  */
 public class Game {
     private int numberOfPlayers;
-    private int turn;
-    
+    // Arrays
     private ArrayList<String> playerNames;
     private ArrayList<Player> players;
     private ArrayList<Card> mainPile;
-    
+    // Player tracking
     private Player currentPlayer;
     private Player previousPlayer;
     private Player nextPlayer;
+    private Player winner;
+    private Deck deck;
+    // Game Logic
     private int nextIndex;
     private boolean clockWise;
-    private Player winner;
+    private int turn;
+    private boolean forfeit;
     
-    private Deck deck;
     
     public Game(ArrayList<String> playerNames, Deck deck){
         this.deck = deck;
         this.players = new ArrayList<>();
         this.numberOfPlayers = playerNames.size();
         this.playerNames = playerNames;
-        System.out.println("number of players: " + numberOfPlayers);
-        for(int i = 0; i < this.numberOfPlayers; i++){
-//            System.out.println("in the loop");
-            String name = playerNames.get(i);
-//            System.out.println(name + ':');
-            Player player = new Player(name, i+1, numberOfPlayers, deck);
-            players.add(player);
-//            System.out.println(numberOfPlayers);
-        }
-        System.out.println("players: " + playerNames);
+        assignPlayers();
         this.currentPlayer = players.get(0);
         this.nextIndex = 1;
         this.nextPlayer = players.get(nextIndex);
         this.previousPlayer = null;
         this.clockWise = true;
         this.winner = null;
+    }
+    
+    public void assignPlayers(){
+        for(int i = 0; i < this.numberOfPlayers; i++){
+            String name = playerNames.get(i);
+            Player player = new Player(name, i+1, numberOfPlayers, deck);
+            players.add(player);
+        }
     }
     
     public int getPlayerDeckSize(int playerNum) {
@@ -137,14 +138,9 @@ public class Game {
     }
     
     public void moveToNextPlayer(){
-//        String[] players2 = {"a","b","c","d"};
-        //Debug
-//        this.clockWise = false;
-        //its always gonna be the previous one
         this.previousPlayer = currentPlayer;
         if(clockWise == true){
             this.currentPlayer = nextPlayer;
-            // If the next index does exist, go back to the first person
             if(nextIndex + 1 == players.size()){
                 this.nextIndex = 0;
                 this.nextPlayer = players.get(nextIndex);
@@ -154,38 +150,40 @@ public class Game {
                 this.nextPlayer = players.get(nextIndex);
             }
         }else{
-            // Code here;
-            // debug
-            //still needs completion
             System.out.println(nextIndex - 1);
-//            this.currentPlayer = previousPlayer;
             if(nextIndex - 2 < 0){
-                // get the last index
-                // NOT -1 (NOT PYTHON)
                 this.nextIndex = players.size() - 1;
-                // current player is now the last element
                 this.currentPlayer = players.get(nextIndex);
-                // the next player is now 
                 this.nextPlayer = players.get(players.size() - 2);
             }
             else{
-                // So confusing
                 this.nextIndex -= 1;
                 this.currentPlayer = players.get(nextIndex);
                 this.nextPlayer = players.get(nextIndex - 1);
             }
         }
-        System.out.println("previous player: "  + previousPlayer);
-        System.out.println("current player: " + currentPlayer);
-        System.out.println("next player: " + nextPlayer);
-        System.out.println("-----------------------------");
+//        System.out.println("previous player: "  + previousPlayer);
+//        System.out.println("current player: " + currentPlayer);
+//        System.out.println("next player: " + nextPlayer);
+//        System.out.println("-----------------------------");
     }
-    
-    
     
     
     public void setNumberOfPlayers(int numPlayers){
         this.numberOfPlayers = numPlayers;
     }
+    
+    public int getNumberOfPlayers() {
+        return this.numberOfPlayers;
     }
+    
+    public int getTurns() {
+        return this.turn;
+    }
+    
+    public boolean isForfeit() {
+        return this.forfeit;
+    }
+}
+
     

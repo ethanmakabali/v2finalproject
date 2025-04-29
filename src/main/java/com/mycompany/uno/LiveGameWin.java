@@ -30,7 +30,6 @@ public class LiveGameWin extends javax.swing.JFrame {
      private ArrayList<JLabel> playerCountLabels;
      private ArrayList<ArrayList<JLabel>> playerFaceDownCards;
      private ArrayList<JButton> btnCardSlots;
-     private HashMap<String, ImageIcon> cardImages;
      private int numberOfPlayers;
      private Game game;
      private Deck deck;
@@ -46,7 +45,6 @@ public class LiveGameWin extends javax.swing.JFrame {
         this.player3FaceDownCards = new ArrayList<>();
         this.player4FaceDownCards = new ArrayList<>();
         this.btnCardSlots = new ArrayList<>();
-        this.cardImages = new HashMap<>();
         
         this.playerFaceDownCards.add(this.player1FaceDownCards);
         this.playerFaceDownCards.add(this.player2FaceDownCards);
@@ -74,9 +72,8 @@ public class LiveGameWin extends javax.swing.JFrame {
         turnOffOtherFaceCardsAtStart();
         updatePlayerCards();
         // deck.getDiscardCard(); // initialize first card
-        lblCurrentPlayer.setText("Current player " + game.getCurrentPlayer());
-        lblNextPlayer.setText("On Deck: " + game.getNextPlayer().getName());
-        
+        lblCurrentPlayer.setText(game.getCurrentPlayer().getName());
+        lblNextPlayer.setText(game.getNextPlayer().getName());
         //ChatGPT this part:
         if (false) {
         // Display the first discard card in the center panel
@@ -128,7 +125,6 @@ public class LiveGameWin extends javax.swing.JFrame {
                 btnCardSlots.get(i).setVisible(false);
             }
         }
-        checkPlayerMoves();
     }
 
     
@@ -317,72 +313,122 @@ public class LiveGameWin extends javax.swing.JFrame {
 
     private void checkPlayerMoves() {
         Player currentPlayer = game.getCurrentPlayer();
-        NoLegalMovesWin nlmw = new NoLegalMovesWin(currentPlayer);
+
         if (!hasLegalMove()) {
-            nlmw.setVisible(true);
-        } else {
-            nlmw.setVisible(false);
+            Card drawnCard = deck.getNextMainPileCard();
+            currentPlayer.getCurrentPlayerDeck().add(drawnCard);
+
+            JOptionPane.showMessageDialog(
+                null,
+                currentPlayer.getName() + " had no legal moves and drew a card.",
+                "No Legal Moves",
+                JOptionPane.INFORMATION_MESSAGE
+            );
+
+            // Update GUI
+            setFaceDownCards();
+            updatePlayerCards();
+
+            // Check if the drawn card is playable
+            if (!drawnCard.canPlayCard(deck.getDiscardCard())) {
+                JOptionPane.showMessageDialog(
+                    null,
+                    "Still no legal moves. Skipping turn.",
+                    "Turn Skipped",
+                    JOptionPane.INFORMATION_MESSAGE
+                );
+
+                game.moveToNextPlayer();
+                lblCurrentPlayer.setText("Current Player: " + game.getCurrentPlayer().getName());
+                lblNextPlayer.setText("On Deck: " + game.getNextPlayer().getName());
+                setFaceDownCards();
+                updatePlayerCards();
+            }
+            // If it IS playable, just let them play it naturally (don’t auto-play it)
         }
     }
 
     
     private void playCard(int cardIndex){
+        // Get current players card
         Card playerCard = game.getCurrentPlayerDeck().get(cardIndex - 1);
-        boolean nextStep = false;
-        ArrayList<Card> discardPile = deck.getDiscardPile();
         Player currentPlayer = game.getCurrentPlayer();
         
-        String declaredColor = playerCard.getColor();
+        // Boolean to determine whether to check if theres a winner
+        boolean nextStep = false;  // Change this variable name it sucks???
+        ArrayList<Card> discardPile = deck.getDiscardPile();
         
+        // Get the color of the played card
+        String declaredColor = playerCard.getColor();
+        lblCurrentColor.setText("Identifying Next Color");
+        
+        // First, Check if its a Wild Card
         if (playerCard.isWildcard()) {
-            // Create the Wild Card Window to get the color they want to set
-            WildCardWin wildCardWin = new WildCardWin();
-            wildCardWin.setVisible(true);
+            if (false) {
+                WildCardWin.selectedColor = null;  // reset
+                WildCardWin wildCardWin = new WildCardWin();
+                wildCardWin.setLocationRelativeTo(this);
+                wildCardWin.setVisible(true);
+                declaredColor = WildCardWin.selectedColor;
+                playerCard.declareColor(declaredColor);
+            } else {
+                String[] possibilities = { "Blue", "Green", "Red", "Yellow" };
+                String s = (String)JOptionPane.showInputDialog(
+                        null,
+                        "Choose Wildcard Color",
+                        "Wildcard Color",
+                        JOptionPane.PLAIN_MESSAGE,
+                        null,
+                        possibilities,
+                        null);
+                playerCard.declareColor(s);
+                declaredColor = s;
+            }
         }
         
+        // Check if the card played is legal, and if so... do this... 
         if (game.playCard(playerCard, declaredColor) == true){
+            lblCurrentColor.setText(playerCard.getColor());
+            
+            // Add the played card to the discard pile and update UI
             discardPile.add(playerCard);
-//            game.getCurrentPlayerDeck().remove(cardIndex - 1);
-            System.out.println("You played this card: " + playerCard);
-            int size = game.getCurrentPlayerDeck().size();
-            System.out.println("Your deck now contains " + size + " elements");
             setFaceDownCards();
             updatePlayerCards();
-            lblCurrentPlayer.setText("Current Player: " + game.getCurrentPlayer().getName());
-            lblNextPlayer.setText("On Deck: " + game.getNextPlayer().getName());
-            System.out.println("The current player is: " + currentPlayer);
-            nextStep = true;
+            lblCurrentPlayer.setText(game.getCurrentPlayer().getName());
+            lblNextPlayer.setText(game.getNextPlayer().getName());
             
-        //ChatGPT this part:
-        // Get the image file name from the method
-        String imageName = playerCard.getImageName(); // e.g., "blue_0.png"
+            // Since the card was played, change the bool flag so we know to 
+            // check for a winner after this branch
+            nextStep = true;
 
-        // Load the image from the root of the classpath
-        URL imageUrl = getClass().getResource("/" + imageName);
+            // Update the UI, first get played cards image
+            String imageName = playerCard.getImageName(); // e.g., "blue_0.png"
+
+            // Load the image from the root of the classpath
+            URL imageUrl = getClass().getResource("/" + imageName);
 
             if (imageUrl != null) {
                 ImageIcon originalIcon = new ImageIcon(imageUrl);
                 Image scaledImage = originalIcon.getImage().getScaledInstance(324, 380, Image.SCALE_SMOOTH);
                 ImageIcon resizedIcon = new ImageIcon(scaledImage);
                 ImageHolder.setIcon(resizedIcon);
-//                createHideCardsWindow();
             } else {
                 System.err.println("Image not found: /" + imageName);
                 ImageHolder.setIcon(null); // fallback
             }
-
-        }
-        
-        else if(game.playCard(playerCard, declaredColor) == false){
+            // If the branch above does not execute, then the move isn't legal
+        } else {
             JOptionPane.showMessageDialog(null, "Please play a legal move", "Invalid Move", JOptionPane.INFORMATION_MESSAGE);
         }
-        
-        if(game.isThereWinner() == true && nextStep == true){
+
+        // If the flag is true, we can now check if there is a winner
+        if (game.isThereWinner() == true && nextStep == true){
             Player winner = game.getWinner();
             WinnerWin winnerScreen = new WinnerWin(winner);
             winnerScreen.setVisible(true);
+        } else {
+            checkPlayerMoves();
         }
-        System.out.println("Winner?  = " + game.isThereWinner());
     }
     
     /**
@@ -444,6 +490,21 @@ public class LiveGameWin extends javax.swing.JFrame {
         imgPlayer1Back11 = new javax.swing.JLabel();
         lblPlayer1FaceDownCards = new javax.swing.JLabel();
         lblPlayer1FaceDownCardsCount = new javax.swing.JLabel();
+        jPanel2 = new javax.swing.JPanel();
+        jPanel85 = new javax.swing.JPanel();
+        ImageHolder = new javax.swing.JLabel();
+        jLabel2 = new javax.swing.JLabel();
+        jPanel3 = new javax.swing.JPanel();
+        btnForfeit = new javax.swing.JButton();
+        jButton2 = new javax.swing.JButton();
+        btnQuitGame = new javax.swing.JButton();
+        jLabel3 = new javax.swing.JLabel();
+        lblCurrent = new javax.swing.JLabel();
+        lblNextPlayer = new javax.swing.JLabel();
+        lblCurrentPlayer = new javax.swing.JLabel();
+        lblondeck = new javax.swing.JLabel();
+        jLabel4 = new javax.swing.JLabel();
+        lblCurrentColor = new javax.swing.JLabel();
         pnlPlayer2FaceDownCards = new javax.swing.JPanel();
         imgPlayer2Back2 = new javax.swing.JLabel();
         imgPlayer2Back3 = new javax.swing.JLabel();
@@ -465,7 +526,7 @@ public class LiveGameWin extends javax.swing.JFrame {
         imgPlayer2Back20 = new javax.swing.JLabel();
         imgPlayer2Back1 = new javax.swing.JLabel();
         imgPlayer2Back11 = new javax.swing.JLabel();
-        lblPlayer2FaceDownCards = new javax.swing.JLabel();
+        lblPlayer1FaceDownCards1 = new javax.swing.JLabel();
         lblPlayer2FaceDownCardsCount = new javax.swing.JLabel();
         pnlPlayer3FaceDownCards = new javax.swing.JPanel();
         imgPlayer3Back2 = new javax.swing.JLabel();
@@ -488,7 +549,7 @@ public class LiveGameWin extends javax.swing.JFrame {
         imgPlayer3Back20 = new javax.swing.JLabel();
         imgPlayer3Back1 = new javax.swing.JLabel();
         imgPlayer3Back11 = new javax.swing.JLabel();
-        lblPlayer3FaceDownCards = new javax.swing.JLabel();
+        lblPlayer1FaceDownCards2 = new javax.swing.JLabel();
         lblPlayer3FaceDownCardsCount = new javax.swing.JLabel();
         pnlPlayer4FaceDownCards = new javax.swing.JPanel();
         imgPlayer4Back2 = new javax.swing.JLabel();
@@ -511,26 +572,18 @@ public class LiveGameWin extends javax.swing.JFrame {
         imgPlayer4Back20 = new javax.swing.JLabel();
         imgPlayer4Back1 = new javax.swing.JLabel();
         imgPlayer4Back11 = new javax.swing.JLabel();
-        lblPlayer4FaceDownCards = new javax.swing.JLabel();
+        lblPlayer1FaceDownCards3 = new javax.swing.JLabel();
         lblPlayer4FaceDownCardsCount = new javax.swing.JLabel();
-        jPanel2 = new javax.swing.JPanel();
-        jPanel85 = new javax.swing.JPanel();
-        ImageHolder = new javax.swing.JLabel();
-        jLabel2 = new javax.swing.JLabel();
-        jPanel3 = new javax.swing.JPanel();
-        btnForfeit = new javax.swing.JButton();
-        jButton2 = new javax.swing.JButton();
-        btnQuitGame = new javax.swing.JButton();
-        jLabel3 = new javax.swing.JLabel();
-        lblCurrentPlayer = new javax.swing.JLabel();
-        lblNextPlayer = new javax.swing.JLabel();
+        jLabel5 = new javax.swing.JLabel();
+        jLabel6 = new javax.swing.JLabel();
+        jLabel9 = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
         pnlLiveGame.setBackground(new java.awt.Color(153, 255, 153));
 
-        jLabel1.setFont(new java.awt.Font("Arial Rounded MT Bold", 1, 24)); // NOI18N
-        jLabel1.setText("Ethan Makabali productions");
+        jLabel1.setFont(new java.awt.Font("Arial Rounded MT Bold", 1, 18)); // NOI18N
+        jLabel1.setText("Ethan Makabali Productions");
 
         jLabel7.setFont(new java.awt.Font("Arial Rounded MT Bold", 1, 24)); // NOI18N
         jLabel7.setText("Your cards:");
@@ -563,7 +616,7 @@ public class LiveGameWin extends javax.swing.JFrame {
             }
         });
 
-        btnCardSlot3.setIcon(new javax.swing.ImageIcon(getClass().getResource("/red1.png"))); // NOI18N
+        btnCardSlot3.setIcon(new javax.swing.ImageIcon(getClass().getResource("/red_1.png"))); // NOI18N
         btnCardSlot3.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnCardSlot3ActionPerformed(evt);
@@ -588,9 +641,57 @@ public class LiveGameWin extends javax.swing.JFrame {
             }
         });
 
+        btnCardSlot9.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnCardSlot9ActionPerformed(evt);
+            }
+        });
+
         btnCardSlot7.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnCardSlot7ActionPerformed(evt);
+            }
+        });
+
+        btnCardSlot8.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnCardSlot8ActionPerformed(evt);
+            }
+        });
+
+        btnCardSlot12.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnCardSlot12ActionPerformed(evt);
+            }
+        });
+
+        btnCardSlot10.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnCardSlot10ActionPerformed(evt);
+            }
+        });
+
+        btnCardSlot11.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnCardSlot11ActionPerformed(evt);
+            }
+        });
+
+        btnCardSlot15.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnCardSlot15ActionPerformed(evt);
+            }
+        });
+
+        btnCardSlot13.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnCardSlot13ActionPerformed(evt);
+            }
+        });
+
+        btnCardSlot14.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnCardSlot14ActionPerformed(evt);
             }
         });
 
@@ -662,10 +763,11 @@ public class LiveGameWin extends javax.swing.JFrame {
                     .addComponent(btnCardSlot8, javax.swing.GroupLayout.PREFERRED_SIZE, 104, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(btnCardSlot7, javax.swing.GroupLayout.PREFERRED_SIZE, 104, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(jPanel84Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(btnCardSlot12, javax.swing.GroupLayout.PREFERRED_SIZE, 104, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(btnCardSlot11, javax.swing.GroupLayout.PREFERRED_SIZE, 104, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(btnCardSlot10, javax.swing.GroupLayout.PREFERRED_SIZE, 104, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGroup(jPanel84Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanel84Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                        .addComponent(btnCardSlot11, javax.swing.GroupLayout.PREFERRED_SIZE, 104, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(btnCardSlot10, javax.swing.GroupLayout.PREFERRED_SIZE, 104, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(btnCardSlot12, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 104, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanel84Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                     .addComponent(btnCardSlot15, javax.swing.GroupLayout.PREFERRED_SIZE, 104, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -684,554 +786,76 @@ public class LiveGameWin extends javax.swing.JFrame {
 
         jScrollPane1.setViewportView(jPanel84);
 
-        pnlPlayer1FaceDownCards.setBackground(new java.awt.Color(153, 255, 153));
+        pnlPlayer1FaceDownCards.setBackground(new java.awt.Color(51, 153, 0));
+        pnlPlayer1FaceDownCards.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
-        imgPlayer1Back2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/unoback.png"))); // NOI18N
+        imgPlayer1Back2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/uno_face_down_cards.png"))); // NOI18N
+        pnlPlayer1FaceDownCards.add(imgPlayer1Back2, new org.netbeans.lib.awtextra.AbsoluteConstraints(53, 33, -1, -1));
 
-        imgPlayer1Back3.setIcon(new javax.swing.ImageIcon(getClass().getResource("/unoback.png"))); // NOI18N
+        imgPlayer1Back3.setIcon(new javax.swing.ImageIcon(getClass().getResource("/uno_face_down_cards.png"))); // NOI18N
+        pnlPlayer1FaceDownCards.add(imgPlayer1Back3, new org.netbeans.lib.awtextra.AbsoluteConstraints(91, 33, -1, -1));
 
-        imgPlayer1Back4.setIcon(new javax.swing.ImageIcon(getClass().getResource("/unoback.png"))); // NOI18N
+        imgPlayer1Back4.setIcon(new javax.swing.ImageIcon(getClass().getResource("/uno_face_down_cards.png"))); // NOI18N
+        pnlPlayer1FaceDownCards.add(imgPlayer1Back4, new org.netbeans.lib.awtextra.AbsoluteConstraints(129, 33, -1, -1));
 
-        imgPlayer1Back5.setIcon(new javax.swing.ImageIcon(getClass().getResource("/unoback.png"))); // NOI18N
+        imgPlayer1Back5.setIcon(new javax.swing.ImageIcon(getClass().getResource("/uno_face_down_cards.png"))); // NOI18N
+        pnlPlayer1FaceDownCards.add(imgPlayer1Back5, new org.netbeans.lib.awtextra.AbsoluteConstraints(167, 33, -1, -1));
 
-        imgPlayer1Back6.setIcon(new javax.swing.ImageIcon(getClass().getResource("/unoback.png"))); // NOI18N
+        imgPlayer1Back6.setIcon(new javax.swing.ImageIcon(getClass().getResource("/uno_face_down_cards.png"))); // NOI18N
+        pnlPlayer1FaceDownCards.add(imgPlayer1Back6, new org.netbeans.lib.awtextra.AbsoluteConstraints(205, 33, -1, -1));
 
-        imgPlayer1Back7.setIcon(new javax.swing.ImageIcon(getClass().getResource("/unoback.png"))); // NOI18N
+        imgPlayer1Back7.setIcon(new javax.swing.ImageIcon(getClass().getResource("/uno_face_down_cards.png"))); // NOI18N
+        pnlPlayer1FaceDownCards.add(imgPlayer1Back7, new org.netbeans.lib.awtextra.AbsoluteConstraints(243, 33, -1, -1));
 
-        imgPlayer1Back8.setIcon(new javax.swing.ImageIcon(getClass().getResource("/unoback.png"))); // NOI18N
+        imgPlayer1Back8.setIcon(new javax.swing.ImageIcon(getClass().getResource("/uno_face_down_cards.png"))); // NOI18N
+        pnlPlayer1FaceDownCards.add(imgPlayer1Back8, new org.netbeans.lib.awtextra.AbsoluteConstraints(281, 33, -1, -1));
 
-        imgPlayer1Back9.setIcon(new javax.swing.ImageIcon(getClass().getResource("/unoback.png"))); // NOI18N
+        imgPlayer1Back9.setIcon(new javax.swing.ImageIcon(getClass().getResource("/uno_face_down_cards.png"))); // NOI18N
+        pnlPlayer1FaceDownCards.add(imgPlayer1Back9, new org.netbeans.lib.awtextra.AbsoluteConstraints(319, 33, -1, -1));
 
-        imgPlayer1Back10.setIcon(new javax.swing.ImageIcon(getClass().getResource("/unoback.png"))); // NOI18N
+        imgPlayer1Back10.setIcon(new javax.swing.ImageIcon(getClass().getResource("/uno_face_down_cards.png"))); // NOI18N
+        pnlPlayer1FaceDownCards.add(imgPlayer1Back10, new org.netbeans.lib.awtextra.AbsoluteConstraints(357, 33, -1, -1));
 
-        imgPlayer1Back12.setIcon(new javax.swing.ImageIcon(getClass().getResource("/unoback.png"))); // NOI18N
+        imgPlayer1Back12.setIcon(new javax.swing.ImageIcon(getClass().getResource("/uno_face_down_cards.png"))); // NOI18N
+        pnlPlayer1FaceDownCards.add(imgPlayer1Back12, new org.netbeans.lib.awtextra.AbsoluteConstraints(55, 93, -1, -1));
 
-        imgPlayer1Back13.setIcon(new javax.swing.ImageIcon(getClass().getResource("/unoback.png"))); // NOI18N
+        imgPlayer1Back13.setIcon(new javax.swing.ImageIcon(getClass().getResource("/uno_face_down_cards.png"))); // NOI18N
+        pnlPlayer1FaceDownCards.add(imgPlayer1Back13, new org.netbeans.lib.awtextra.AbsoluteConstraints(93, 93, -1, -1));
 
-        imgPlayer1Back14.setIcon(new javax.swing.ImageIcon(getClass().getResource("/unoback.png"))); // NOI18N
+        imgPlayer1Back14.setIcon(new javax.swing.ImageIcon(getClass().getResource("/uno_face_down_cards.png"))); // NOI18N
+        pnlPlayer1FaceDownCards.add(imgPlayer1Back14, new org.netbeans.lib.awtextra.AbsoluteConstraints(131, 93, -1, -1));
 
-        imgPlayer1Back15.setIcon(new javax.swing.ImageIcon(getClass().getResource("/unoback.png"))); // NOI18N
+        imgPlayer1Back15.setIcon(new javax.swing.ImageIcon(getClass().getResource("/uno_face_down_cards.png"))); // NOI18N
+        pnlPlayer1FaceDownCards.add(imgPlayer1Back15, new org.netbeans.lib.awtextra.AbsoluteConstraints(169, 93, -1, -1));
 
-        imgPlayer1Back16.setIcon(new javax.swing.ImageIcon(getClass().getResource("/unoback.png"))); // NOI18N
+        imgPlayer1Back16.setIcon(new javax.swing.ImageIcon(getClass().getResource("/uno_face_down_cards.png"))); // NOI18N
+        pnlPlayer1FaceDownCards.add(imgPlayer1Back16, new org.netbeans.lib.awtextra.AbsoluteConstraints(207, 93, -1, -1));
 
-        imgPlayer1Back17.setIcon(new javax.swing.ImageIcon(getClass().getResource("/unoback.png"))); // NOI18N
+        imgPlayer1Back17.setIcon(new javax.swing.ImageIcon(getClass().getResource("/uno_face_down_cards.png"))); // NOI18N
+        pnlPlayer1FaceDownCards.add(imgPlayer1Back17, new org.netbeans.lib.awtextra.AbsoluteConstraints(245, 93, -1, -1));
 
-        imgPlayer1Back18.setIcon(new javax.swing.ImageIcon(getClass().getResource("/unoback.png"))); // NOI18N
+        imgPlayer1Back18.setIcon(new javax.swing.ImageIcon(getClass().getResource("/uno_face_down_cards.png"))); // NOI18N
+        pnlPlayer1FaceDownCards.add(imgPlayer1Back18, new org.netbeans.lib.awtextra.AbsoluteConstraints(283, 93, -1, -1));
 
-        imgPlayer1Back19.setIcon(new javax.swing.ImageIcon(getClass().getResource("/unoback.png"))); // NOI18N
+        imgPlayer1Back19.setIcon(new javax.swing.ImageIcon(getClass().getResource("/uno_face_down_cards.png"))); // NOI18N
+        pnlPlayer1FaceDownCards.add(imgPlayer1Back19, new org.netbeans.lib.awtextra.AbsoluteConstraints(321, 93, -1, -1));
 
-        imgPlayer1Back20.setIcon(new javax.swing.ImageIcon(getClass().getResource("/unoback.png"))); // NOI18N
+        imgPlayer1Back20.setIcon(new javax.swing.ImageIcon(getClass().getResource("/uno_face_down_cards.png"))); // NOI18N
+        pnlPlayer1FaceDownCards.add(imgPlayer1Back20, new org.netbeans.lib.awtextra.AbsoluteConstraints(359, 93, -1, -1));
 
-        imgPlayer1Back1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/unoback.png"))); // NOI18N
+        imgPlayer1Back1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/uno_face_down_cards.png"))); // NOI18N
+        pnlPlayer1FaceDownCards.add(imgPlayer1Back1, new org.netbeans.lib.awtextra.AbsoluteConstraints(15, 33, -1, -1));
 
-        imgPlayer1Back11.setIcon(new javax.swing.ImageIcon(getClass().getResource("/unoback.png"))); // NOI18N
+        imgPlayer1Back11.setIcon(new javax.swing.ImageIcon(getClass().getResource("/uno_face_down_cards.png"))); // NOI18N
+        pnlPlayer1FaceDownCards.add(imgPlayer1Back11, new org.netbeans.lib.awtextra.AbsoluteConstraints(17, 93, -1, -1));
 
         lblPlayer1FaceDownCards.setFont(new java.awt.Font("Arial Rounded MT Bold", 1, 18)); // NOI18N
         lblPlayer1FaceDownCards.setText("Player 1 Cards: ");
+        pnlPlayer1FaceDownCards.add(lblPlayer1FaceDownCards, new org.netbeans.lib.awtextra.AbsoluteConstraints(15, 6, -1, -1));
 
         lblPlayer1FaceDownCardsCount.setFont(new java.awt.Font("Arial Rounded MT Bold", 1, 18)); // NOI18N
         lblPlayer1FaceDownCardsCount.setText("0");
-
-        javax.swing.GroupLayout pnlPlayer1FaceDownCardsLayout = new javax.swing.GroupLayout(pnlPlayer1FaceDownCards);
-        pnlPlayer1FaceDownCards.setLayout(pnlPlayer1FaceDownCardsLayout);
-        pnlPlayer1FaceDownCardsLayout.setHorizontalGroup(
-            pnlPlayer1FaceDownCardsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(pnlPlayer1FaceDownCardsLayout.createSequentialGroup()
-                .addGap(15, 15, 15)
-                .addGroup(pnlPlayer1FaceDownCardsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addGroup(pnlPlayer1FaceDownCardsLayout.createSequentialGroup()
-                        .addComponent(imgPlayer1Back11)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(imgPlayer1Back12)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(imgPlayer1Back13)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(imgPlayer1Back14)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(imgPlayer1Back15)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(imgPlayer1Back16)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(imgPlayer1Back17)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(imgPlayer1Back18)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(imgPlayer1Back19)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(imgPlayer1Back20))
-                    .addGroup(pnlPlayer1FaceDownCardsLayout.createSequentialGroup()
-                        .addGroup(pnlPlayer1FaceDownCardsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, pnlPlayer1FaceDownCardsLayout.createSequentialGroup()
-                                .addComponent(imgPlayer1Back1)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(imgPlayer1Back2)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(imgPlayer1Back3)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(imgPlayer1Back4)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(imgPlayer1Back5)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED))
-                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, pnlPlayer1FaceDownCardsLayout.createSequentialGroup()
-                                .addComponent(lblPlayer1FaceDownCards)
-                                .addGap(43, 43, 43)))
-                        .addGroup(pnlPlayer1FaceDownCardsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(lblPlayer1FaceDownCardsCount, javax.swing.GroupLayout.PREFERRED_SIZE, 26, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addGroup(pnlPlayer1FaceDownCardsLayout.createSequentialGroup()
-                                .addComponent(imgPlayer1Back6)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(imgPlayer1Back7)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(imgPlayer1Back8)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(imgPlayer1Back9)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(imgPlayer1Back10)))))
-                .addContainerGap(15, Short.MAX_VALUE))
-        );
-        pnlPlayer1FaceDownCardsLayout.setVerticalGroup(
-            pnlPlayer1FaceDownCardsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, pnlPlayer1FaceDownCardsLayout.createSequentialGroup()
-                .addContainerGap(12, Short.MAX_VALUE)
-                .addGroup(pnlPlayer1FaceDownCardsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(lblPlayer1FaceDownCards)
-                    .addComponent(lblPlayer1FaceDownCardsCount))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(pnlPlayer1FaceDownCardsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(imgPlayer1Back10)
-                    .addComponent(imgPlayer1Back9)
-                    .addComponent(imgPlayer1Back8)
-                    .addComponent(imgPlayer1Back7)
-                    .addComponent(imgPlayer1Back6)
-                    .addComponent(imgPlayer1Back5)
-                    .addComponent(imgPlayer1Back4)
-                    .addComponent(imgPlayer1Back3)
-                    .addComponent(imgPlayer1Back2)
-                    .addComponent(imgPlayer1Back1))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(pnlPlayer1FaceDownCardsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(imgPlayer1Back20)
-                    .addComponent(imgPlayer1Back19)
-                    .addComponent(imgPlayer1Back18)
-                    .addComponent(imgPlayer1Back17)
-                    .addComponent(imgPlayer1Back16)
-                    .addComponent(imgPlayer1Back15)
-                    .addComponent(imgPlayer1Back14)
-                    .addComponent(imgPlayer1Back13)
-                    .addComponent(imgPlayer1Back12)
-                    .addComponent(imgPlayer1Back11))
-                .addContainerGap())
-        );
-
-        pnlPlayer2FaceDownCards.setBackground(new java.awt.Color(153, 255, 153));
-
-        imgPlayer2Back2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/unoback.png"))); // NOI18N
-
-        imgPlayer2Back3.setIcon(new javax.swing.ImageIcon(getClass().getResource("/unoback.png"))); // NOI18N
-
-        imgPlayer2Back4.setIcon(new javax.swing.ImageIcon(getClass().getResource("/unoback.png"))); // NOI18N
-
-        imgPlayer2Back5.setIcon(new javax.swing.ImageIcon(getClass().getResource("/unoback.png"))); // NOI18N
-
-        imgPlayer2Back6.setIcon(new javax.swing.ImageIcon(getClass().getResource("/unoback.png"))); // NOI18N
-
-        imgPlayer2Back7.setIcon(new javax.swing.ImageIcon(getClass().getResource("/unoback.png"))); // NOI18N
-
-        imgPlayer2Back8.setIcon(new javax.swing.ImageIcon(getClass().getResource("/unoback.png"))); // NOI18N
-
-        imgPlayer2Back9.setIcon(new javax.swing.ImageIcon(getClass().getResource("/unoback.png"))); // NOI18N
-
-        imgPlayer2Back10.setIcon(new javax.swing.ImageIcon(getClass().getResource("/unoback.png"))); // NOI18N
-
-        imgPlayer2Back12.setIcon(new javax.swing.ImageIcon(getClass().getResource("/unoback.png"))); // NOI18N
-
-        imgPlayer2Back13.setIcon(new javax.swing.ImageIcon(getClass().getResource("/unoback.png"))); // NOI18N
-
-        imgPlayer2Back14.setIcon(new javax.swing.ImageIcon(getClass().getResource("/unoback.png"))); // NOI18N
-
-        imgPlayer2Back15.setIcon(new javax.swing.ImageIcon(getClass().getResource("/unoback.png"))); // NOI18N
-
-        imgPlayer2Back16.setIcon(new javax.swing.ImageIcon(getClass().getResource("/unoback.png"))); // NOI18N
-
-        imgPlayer2Back17.setIcon(new javax.swing.ImageIcon(getClass().getResource("/unoback.png"))); // NOI18N
-
-        imgPlayer2Back18.setIcon(new javax.swing.ImageIcon(getClass().getResource("/unoback.png"))); // NOI18N
-
-        imgPlayer2Back19.setIcon(new javax.swing.ImageIcon(getClass().getResource("/unoback.png"))); // NOI18N
-
-        imgPlayer2Back20.setIcon(new javax.swing.ImageIcon(getClass().getResource("/unoback.png"))); // NOI18N
-
-        imgPlayer2Back1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/unoback.png"))); // NOI18N
-
-        imgPlayer2Back11.setIcon(new javax.swing.ImageIcon(getClass().getResource("/unoback.png"))); // NOI18N
-
-        lblPlayer2FaceDownCards.setFont(new java.awt.Font("Arial Rounded MT Bold", 1, 18)); // NOI18N
-        lblPlayer2FaceDownCards.setText("Player 2 Cards: ");
-
-        lblPlayer2FaceDownCardsCount.setFont(new java.awt.Font("Arial Rounded MT Bold", 1, 18)); // NOI18N
-        lblPlayer2FaceDownCardsCount.setText("0");
-
-        javax.swing.GroupLayout pnlPlayer2FaceDownCardsLayout = new javax.swing.GroupLayout(pnlPlayer2FaceDownCards);
-        pnlPlayer2FaceDownCards.setLayout(pnlPlayer2FaceDownCardsLayout);
-        pnlPlayer2FaceDownCardsLayout.setHorizontalGroup(
-            pnlPlayer2FaceDownCardsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(pnlPlayer2FaceDownCardsLayout.createSequentialGroup()
-                .addGap(15, 15, 15)
-                .addGroup(pnlPlayer2FaceDownCardsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addGroup(pnlPlayer2FaceDownCardsLayout.createSequentialGroup()
-                        .addComponent(imgPlayer2Back11)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(imgPlayer2Back12)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(imgPlayer2Back13)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(imgPlayer2Back14)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(imgPlayer2Back15)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(imgPlayer2Back16)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(imgPlayer2Back17)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(imgPlayer2Back18)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(imgPlayer2Back19)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(imgPlayer2Back20))
-                    .addGroup(pnlPlayer2FaceDownCardsLayout.createSequentialGroup()
-                        .addGroup(pnlPlayer2FaceDownCardsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                            .addComponent(lblPlayer2FaceDownCards, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addGroup(pnlPlayer2FaceDownCardsLayout.createSequentialGroup()
-                                .addComponent(imgPlayer2Back1)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(imgPlayer2Back2)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(imgPlayer2Back3)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(imgPlayer2Back4)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(imgPlayer2Back5)))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(pnlPlayer2FaceDownCardsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(pnlPlayer2FaceDownCardsLayout.createSequentialGroup()
-                                .addComponent(imgPlayer2Back6)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(imgPlayer2Back7)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(imgPlayer2Back8)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(imgPlayer2Back9)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(imgPlayer2Back10))
-                            .addComponent(lblPlayer2FaceDownCardsCount, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE))))
-                .addContainerGap(15, Short.MAX_VALUE))
-        );
-        pnlPlayer2FaceDownCardsLayout.setVerticalGroup(
-            pnlPlayer2FaceDownCardsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, pnlPlayer2FaceDownCardsLayout.createSequentialGroup()
-                .addGap(0, 12, Short.MAX_VALUE)
-                .addGroup(pnlPlayer2FaceDownCardsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(lblPlayer2FaceDownCards)
-                    .addComponent(lblPlayer2FaceDownCardsCount))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addGroup(pnlPlayer2FaceDownCardsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(imgPlayer2Back10)
-                    .addComponent(imgPlayer2Back9)
-                    .addComponent(imgPlayer2Back8)
-                    .addComponent(imgPlayer2Back7)
-                    .addComponent(imgPlayer2Back6)
-                    .addComponent(imgPlayer2Back5)
-                    .addComponent(imgPlayer2Back4)
-                    .addComponent(imgPlayer2Back3)
-                    .addComponent(imgPlayer2Back2)
-                    .addComponent(imgPlayer2Back1))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(pnlPlayer2FaceDownCardsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(imgPlayer2Back20)
-                    .addComponent(imgPlayer2Back19)
-                    .addComponent(imgPlayer2Back18)
-                    .addComponent(imgPlayer2Back17)
-                    .addComponent(imgPlayer2Back16)
-                    .addComponent(imgPlayer2Back15)
-                    .addComponent(imgPlayer2Back14)
-                    .addComponent(imgPlayer2Back13)
-                    .addComponent(imgPlayer2Back12)
-                    .addComponent(imgPlayer2Back11)))
-        );
-
-        pnlPlayer3FaceDownCards.setBackground(new java.awt.Color(153, 255, 153));
-
-        imgPlayer3Back2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/unoback.png"))); // NOI18N
-
-        imgPlayer3Back3.setIcon(new javax.swing.ImageIcon(getClass().getResource("/unoback.png"))); // NOI18N
-
-        imgPlayer3Back4.setIcon(new javax.swing.ImageIcon(getClass().getResource("/unoback.png"))); // NOI18N
-
-        imgPlayer3Back5.setIcon(new javax.swing.ImageIcon(getClass().getResource("/unoback.png"))); // NOI18N
-
-        imgPlayer3Back6.setIcon(new javax.swing.ImageIcon(getClass().getResource("/unoback.png"))); // NOI18N
-
-        imgPlayer3Back7.setIcon(new javax.swing.ImageIcon(getClass().getResource("/unoback.png"))); // NOI18N
-
-        imgPlayer3Back8.setIcon(new javax.swing.ImageIcon(getClass().getResource("/unoback.png"))); // NOI18N
-
-        imgPlayer3Back9.setIcon(new javax.swing.ImageIcon(getClass().getResource("/unoback.png"))); // NOI18N
-
-        imgPlayer3Back10.setIcon(new javax.swing.ImageIcon(getClass().getResource("/unoback.png"))); // NOI18N
-
-        imgPlayer3Back12.setIcon(new javax.swing.ImageIcon(getClass().getResource("/unoback.png"))); // NOI18N
-
-        imgPlayer3Back13.setIcon(new javax.swing.ImageIcon(getClass().getResource("/unoback.png"))); // NOI18N
-
-        imgPlayer3Back14.setIcon(new javax.swing.ImageIcon(getClass().getResource("/unoback.png"))); // NOI18N
-
-        imgPlayer3Back15.setIcon(new javax.swing.ImageIcon(getClass().getResource("/unoback.png"))); // NOI18N
-
-        imgPlayer3Back16.setIcon(new javax.swing.ImageIcon(getClass().getResource("/unoback.png"))); // NOI18N
-
-        imgPlayer3Back17.setIcon(new javax.swing.ImageIcon(getClass().getResource("/unoback.png"))); // NOI18N
-
-        imgPlayer3Back18.setIcon(new javax.swing.ImageIcon(getClass().getResource("/unoback.png"))); // NOI18N
-
-        imgPlayer3Back19.setIcon(new javax.swing.ImageIcon(getClass().getResource("/unoback.png"))); // NOI18N
-
-        imgPlayer3Back20.setIcon(new javax.swing.ImageIcon(getClass().getResource("/unoback.png"))); // NOI18N
-
-        imgPlayer3Back1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/unoback.png"))); // NOI18N
-
-        imgPlayer3Back11.setIcon(new javax.swing.ImageIcon(getClass().getResource("/unoback.png"))); // NOI18N
-
-        lblPlayer3FaceDownCards.setFont(new java.awt.Font("Arial Rounded MT Bold", 1, 18)); // NOI18N
-        lblPlayer3FaceDownCards.setText("Player 3 Cards: ");
-
-        lblPlayer3FaceDownCardsCount.setFont(new java.awt.Font("Arial Rounded MT Bold", 1, 18)); // NOI18N
-        lblPlayer3FaceDownCardsCount.setText("0");
-
-        javax.swing.GroupLayout pnlPlayer3FaceDownCardsLayout = new javax.swing.GroupLayout(pnlPlayer3FaceDownCards);
-        pnlPlayer3FaceDownCards.setLayout(pnlPlayer3FaceDownCardsLayout);
-        pnlPlayer3FaceDownCardsLayout.setHorizontalGroup(
-            pnlPlayer3FaceDownCardsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(pnlPlayer3FaceDownCardsLayout.createSequentialGroup()
-                .addGap(15, 15, 15)
-                .addGroup(pnlPlayer3FaceDownCardsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addGroup(pnlPlayer3FaceDownCardsLayout.createSequentialGroup()
-                        .addComponent(imgPlayer3Back11)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(imgPlayer3Back12)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(imgPlayer3Back13)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(imgPlayer3Back14)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(imgPlayer3Back15)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(imgPlayer3Back16)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(imgPlayer3Back17)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(imgPlayer3Back18)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(imgPlayer3Back19)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(imgPlayer3Back20))
-                    .addGroup(pnlPlayer3FaceDownCardsLayout.createSequentialGroup()
-                        .addGroup(pnlPlayer3FaceDownCardsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                            .addComponent(lblPlayer3FaceDownCards, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addGroup(pnlPlayer3FaceDownCardsLayout.createSequentialGroup()
-                                .addComponent(imgPlayer3Back1)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(imgPlayer3Back2)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(imgPlayer3Back3)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(imgPlayer3Back4)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(imgPlayer3Back5)))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(pnlPlayer3FaceDownCardsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(pnlPlayer3FaceDownCardsLayout.createSequentialGroup()
-                                .addComponent(imgPlayer3Back6)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(imgPlayer3Back7)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(imgPlayer3Back8)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(imgPlayer3Back9)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(imgPlayer3Back10))
-                            .addComponent(lblPlayer3FaceDownCardsCount, javax.swing.GroupLayout.PREFERRED_SIZE, 23, javax.swing.GroupLayout.PREFERRED_SIZE))))
-                .addContainerGap(35, Short.MAX_VALUE))
-        );
-        pnlPlayer3FaceDownCardsLayout.setVerticalGroup(
-            pnlPlayer3FaceDownCardsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, pnlPlayer3FaceDownCardsLayout.createSequentialGroup()
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addGroup(pnlPlayer3FaceDownCardsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(lblPlayer3FaceDownCards)
-                    .addComponent(lblPlayer3FaceDownCardsCount))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addGroup(pnlPlayer3FaceDownCardsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(imgPlayer3Back10)
-                    .addComponent(imgPlayer3Back9)
-                    .addComponent(imgPlayer3Back8)
-                    .addComponent(imgPlayer3Back7)
-                    .addComponent(imgPlayer3Back6)
-                    .addComponent(imgPlayer3Back5)
-                    .addComponent(imgPlayer3Back4)
-                    .addComponent(imgPlayer3Back3)
-                    .addComponent(imgPlayer3Back2)
-                    .addComponent(imgPlayer3Back1))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(pnlPlayer3FaceDownCardsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(imgPlayer3Back20)
-                    .addComponent(imgPlayer3Back19)
-                    .addComponent(imgPlayer3Back18)
-                    .addComponent(imgPlayer3Back17)
-                    .addComponent(imgPlayer3Back16)
-                    .addComponent(imgPlayer3Back15)
-                    .addComponent(imgPlayer3Back14)
-                    .addComponent(imgPlayer3Back13)
-                    .addComponent(imgPlayer3Back12)
-                    .addComponent(imgPlayer3Back11))
-                .addContainerGap())
-        );
-
-        pnlPlayer4FaceDownCards.setBackground(new java.awt.Color(153, 255, 153));
-
-        imgPlayer4Back2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/unoback.png"))); // NOI18N
-
-        imgPlayer4Back3.setIcon(new javax.swing.ImageIcon(getClass().getResource("/unoback.png"))); // NOI18N
-
-        imgPlayer4Back4.setIcon(new javax.swing.ImageIcon(getClass().getResource("/unoback.png"))); // NOI18N
-
-        imgPlayer4Back5.setIcon(new javax.swing.ImageIcon(getClass().getResource("/unoback.png"))); // NOI18N
-
-        imgPlayer4Back6.setIcon(new javax.swing.ImageIcon(getClass().getResource("/unoback.png"))); // NOI18N
-
-        imgPlayer4Back7.setIcon(new javax.swing.ImageIcon(getClass().getResource("/unoback.png"))); // NOI18N
-
-        imgPlayer4Back8.setIcon(new javax.swing.ImageIcon(getClass().getResource("/unoback.png"))); // NOI18N
-
-        imgPlayer4Back9.setIcon(new javax.swing.ImageIcon(getClass().getResource("/unoback.png"))); // NOI18N
-
-        imgPlayer4Back10.setIcon(new javax.swing.ImageIcon(getClass().getResource("/unoback.png"))); // NOI18N
-
-        imgPlayer4Back12.setIcon(new javax.swing.ImageIcon(getClass().getResource("/unoback.png"))); // NOI18N
-
-        imgPlayer4Back13.setIcon(new javax.swing.ImageIcon(getClass().getResource("/unoback.png"))); // NOI18N
-
-        imgPlayer4Back14.setIcon(new javax.swing.ImageIcon(getClass().getResource("/unoback.png"))); // NOI18N
-
-        imgPlayer4Back15.setIcon(new javax.swing.ImageIcon(getClass().getResource("/unoback.png"))); // NOI18N
-
-        imgPlayer4Back16.setIcon(new javax.swing.ImageIcon(getClass().getResource("/unoback.png"))); // NOI18N
-
-        imgPlayer4Back17.setIcon(new javax.swing.ImageIcon(getClass().getResource("/unoback.png"))); // NOI18N
-
-        imgPlayer4Back18.setIcon(new javax.swing.ImageIcon(getClass().getResource("/unoback.png"))); // NOI18N
-
-        imgPlayer4Back19.setIcon(new javax.swing.ImageIcon(getClass().getResource("/unoback.png"))); // NOI18N
-
-        imgPlayer4Back20.setIcon(new javax.swing.ImageIcon(getClass().getResource("/unoback.png"))); // NOI18N
-
-        imgPlayer4Back1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/unoback.png"))); // NOI18N
-
-        imgPlayer4Back11.setIcon(new javax.swing.ImageIcon(getClass().getResource("/unoback.png"))); // NOI18N
-
-        lblPlayer4FaceDownCards.setFont(new java.awt.Font("Arial Rounded MT Bold", 1, 18)); // NOI18N
-        lblPlayer4FaceDownCards.setText("Player 4 Cards: ");
-
-        lblPlayer4FaceDownCardsCount.setFont(new java.awt.Font("Arial Rounded MT Bold", 1, 18)); // NOI18N
-        lblPlayer4FaceDownCardsCount.setText("0");
-
-        javax.swing.GroupLayout pnlPlayer4FaceDownCardsLayout = new javax.swing.GroupLayout(pnlPlayer4FaceDownCards);
-        pnlPlayer4FaceDownCards.setLayout(pnlPlayer4FaceDownCardsLayout);
-        pnlPlayer4FaceDownCardsLayout.setHorizontalGroup(
-            pnlPlayer4FaceDownCardsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(pnlPlayer4FaceDownCardsLayout.createSequentialGroup()
-                .addGap(15, 15, 15)
-                .addGroup(pnlPlayer4FaceDownCardsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addGroup(pnlPlayer4FaceDownCardsLayout.createSequentialGroup()
-                        .addComponent(imgPlayer4Back11)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(imgPlayer4Back12)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(imgPlayer4Back13)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(imgPlayer4Back14)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(imgPlayer4Back15)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(imgPlayer4Back16)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(imgPlayer4Back17)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(imgPlayer4Back18)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(imgPlayer4Back19)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(imgPlayer4Back20))
-                    .addGroup(pnlPlayer4FaceDownCardsLayout.createSequentialGroup()
-                        .addGroup(pnlPlayer4FaceDownCardsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                            .addGroup(pnlPlayer4FaceDownCardsLayout.createSequentialGroup()
-                                .addComponent(imgPlayer4Back1)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(imgPlayer4Back2)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(imgPlayer4Back3)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(imgPlayer4Back4)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(imgPlayer4Back5))
-                            .addComponent(lblPlayer4FaceDownCards, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(pnlPlayer4FaceDownCardsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(pnlPlayer4FaceDownCardsLayout.createSequentialGroup()
-                                .addComponent(imgPlayer4Back6)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(imgPlayer4Back7)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(imgPlayer4Back8)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(imgPlayer4Back9)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(imgPlayer4Back10))
-                            .addComponent(lblPlayer4FaceDownCardsCount, javax.swing.GroupLayout.PREFERRED_SIZE, 18, javax.swing.GroupLayout.PREFERRED_SIZE))))
-                .addContainerGap(15, Short.MAX_VALUE))
-        );
-        pnlPlayer4FaceDownCardsLayout.setVerticalGroup(
-            pnlPlayer4FaceDownCardsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, pnlPlayer4FaceDownCardsLayout.createSequentialGroup()
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addGroup(pnlPlayer4FaceDownCardsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(lblPlayer4FaceDownCards)
-                    .addComponent(lblPlayer4FaceDownCardsCount))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addGroup(pnlPlayer4FaceDownCardsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(imgPlayer4Back10)
-                    .addComponent(imgPlayer4Back9)
-                    .addComponent(imgPlayer4Back8)
-                    .addComponent(imgPlayer4Back7)
-                    .addComponent(imgPlayer4Back6)
-                    .addComponent(imgPlayer4Back5)
-                    .addComponent(imgPlayer4Back4)
-                    .addComponent(imgPlayer4Back3)
-                    .addComponent(imgPlayer4Back2)
-                    .addComponent(imgPlayer4Back1))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(pnlPlayer4FaceDownCardsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(imgPlayer4Back20)
-                    .addComponent(imgPlayer4Back19)
-                    .addComponent(imgPlayer4Back18)
-                    .addComponent(imgPlayer4Back17)
-                    .addComponent(imgPlayer4Back16)
-                    .addComponent(imgPlayer4Back15)
-                    .addComponent(imgPlayer4Back14)
-                    .addComponent(imgPlayer4Back13)
-                    .addComponent(imgPlayer4Back12)
-                    .addComponent(imgPlayer4Back11))
-                .addContainerGap())
-        );
+        pnlPlayer1FaceDownCards.add(lblPlayer1FaceDownCardsCount, new org.netbeans.lib.awtextra.AbsoluteConstraints(330, 6, 61, -1));
 
         jPanel2.setBackground(new java.awt.Color(153, 255, 153));
 
@@ -1297,32 +921,272 @@ public class LiveGameWin extends javax.swing.JFrame {
         jPanel2.setLayout(jPanel2Layout);
         jPanel2Layout.setHorizontalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel2Layout.createSequentialGroup()
-                .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(0, 0, Short.MAX_VALUE))
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel2Layout.createSequentialGroup()
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(jPanel85, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(43, 43, 43))
+            .addGroup(jPanel2Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         jPanel2Layout.setVerticalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel2Layout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(jPanel85, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(18, 18, 18)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addContainerGap())
+                .addGap(18, 18, 18))
         );
 
         jLabel3.setFont(new java.awt.Font("Arial Rounded MT Bold", 1, 24)); // NOI18N
         jLabel3.setText("Current Card:");
 
-        lblCurrentPlayer.setFont(new java.awt.Font("Arial Rounded MT Bold", 1, 18)); // NOI18N
-        lblCurrentPlayer.setText("Current Player");
+        lblCurrent.setFont(new java.awt.Font("Arial Rounded MT Bold", 1, 18)); // NOI18N
+        lblCurrent.setForeground(new java.awt.Color(0, 51, 255));
+        lblCurrent.setText("Current Player:");
 
         lblNextPlayer.setFont(new java.awt.Font("Arial Rounded MT Bold", 1, 18)); // NOI18N
         lblNextPlayer.setText("On Deck:");
+
+        lblCurrentPlayer.setFont(new java.awt.Font("Arial Rounded MT Bold", 1, 18)); // NOI18N
+        lblCurrentPlayer.setText("Current Player");
+
+        lblondeck.setFont(new java.awt.Font("Arial Rounded MT Bold", 1, 18)); // NOI18N
+        lblondeck.setForeground(new java.awt.Color(0, 51, 255));
+        lblondeck.setText("On Deck");
+
+        jLabel4.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
+        jLabel4.setText("Current Color:");
+
+        lblCurrentColor.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
+        lblCurrentColor.setText("No Color Detected");
+
+        pnlPlayer2FaceDownCards.setBackground(new java.awt.Color(255, 153, 255));
+        pnlPlayer2FaceDownCards.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
+
+        imgPlayer2Back2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/uno_face_down_cards.png"))); // NOI18N
+        pnlPlayer2FaceDownCards.add(imgPlayer2Back2, new org.netbeans.lib.awtextra.AbsoluteConstraints(53, 33, -1, -1));
+
+        imgPlayer2Back3.setIcon(new javax.swing.ImageIcon(getClass().getResource("/uno_face_down_cards.png"))); // NOI18N
+        pnlPlayer2FaceDownCards.add(imgPlayer2Back3, new org.netbeans.lib.awtextra.AbsoluteConstraints(91, 33, -1, -1));
+
+        imgPlayer2Back4.setIcon(new javax.swing.ImageIcon(getClass().getResource("/uno_face_down_cards.png"))); // NOI18N
+        pnlPlayer2FaceDownCards.add(imgPlayer2Back4, new org.netbeans.lib.awtextra.AbsoluteConstraints(129, 33, -1, -1));
+
+        imgPlayer2Back5.setIcon(new javax.swing.ImageIcon(getClass().getResource("/uno_face_down_cards.png"))); // NOI18N
+        pnlPlayer2FaceDownCards.add(imgPlayer2Back5, new org.netbeans.lib.awtextra.AbsoluteConstraints(167, 33, -1, -1));
+
+        imgPlayer2Back6.setIcon(new javax.swing.ImageIcon(getClass().getResource("/uno_face_down_cards.png"))); // NOI18N
+        pnlPlayer2FaceDownCards.add(imgPlayer2Back6, new org.netbeans.lib.awtextra.AbsoluteConstraints(205, 33, -1, -1));
+
+        imgPlayer2Back7.setIcon(new javax.swing.ImageIcon(getClass().getResource("/uno_face_down_cards.png"))); // NOI18N
+        pnlPlayer2FaceDownCards.add(imgPlayer2Back7, new org.netbeans.lib.awtextra.AbsoluteConstraints(243, 33, -1, -1));
+
+        imgPlayer2Back8.setIcon(new javax.swing.ImageIcon(getClass().getResource("/uno_face_down_cards.png"))); // NOI18N
+        pnlPlayer2FaceDownCards.add(imgPlayer2Back8, new org.netbeans.lib.awtextra.AbsoluteConstraints(281, 33, -1, -1));
+
+        imgPlayer2Back9.setIcon(new javax.swing.ImageIcon(getClass().getResource("/uno_face_down_cards.png"))); // NOI18N
+        pnlPlayer2FaceDownCards.add(imgPlayer2Back9, new org.netbeans.lib.awtextra.AbsoluteConstraints(319, 33, -1, -1));
+
+        imgPlayer2Back10.setIcon(new javax.swing.ImageIcon(getClass().getResource("/uno_face_down_cards.png"))); // NOI18N
+        pnlPlayer2FaceDownCards.add(imgPlayer2Back10, new org.netbeans.lib.awtextra.AbsoluteConstraints(357, 33, -1, -1));
+
+        imgPlayer2Back12.setIcon(new javax.swing.ImageIcon(getClass().getResource("/uno_face_down_cards.png"))); // NOI18N
+        pnlPlayer2FaceDownCards.add(imgPlayer2Back12, new org.netbeans.lib.awtextra.AbsoluteConstraints(55, 93, -1, -1));
+
+        imgPlayer2Back13.setIcon(new javax.swing.ImageIcon(getClass().getResource("/uno_face_down_cards.png"))); // NOI18N
+        pnlPlayer2FaceDownCards.add(imgPlayer2Back13, new org.netbeans.lib.awtextra.AbsoluteConstraints(93, 93, -1, -1));
+
+        imgPlayer2Back14.setIcon(new javax.swing.ImageIcon(getClass().getResource("/uno_face_down_cards.png"))); // NOI18N
+        pnlPlayer2FaceDownCards.add(imgPlayer2Back14, new org.netbeans.lib.awtextra.AbsoluteConstraints(131, 93, -1, -1));
+
+        imgPlayer2Back15.setIcon(new javax.swing.ImageIcon(getClass().getResource("/uno_face_down_cards.png"))); // NOI18N
+        pnlPlayer2FaceDownCards.add(imgPlayer2Back15, new org.netbeans.lib.awtextra.AbsoluteConstraints(169, 93, -1, -1));
+
+        imgPlayer2Back16.setIcon(new javax.swing.ImageIcon(getClass().getResource("/uno_face_down_cards.png"))); // NOI18N
+        pnlPlayer2FaceDownCards.add(imgPlayer2Back16, new org.netbeans.lib.awtextra.AbsoluteConstraints(207, 93, -1, -1));
+
+        imgPlayer2Back17.setIcon(new javax.swing.ImageIcon(getClass().getResource("/uno_face_down_cards.png"))); // NOI18N
+        pnlPlayer2FaceDownCards.add(imgPlayer2Back17, new org.netbeans.lib.awtextra.AbsoluteConstraints(245, 93, -1, -1));
+
+        imgPlayer2Back18.setIcon(new javax.swing.ImageIcon(getClass().getResource("/uno_face_down_cards.png"))); // NOI18N
+        pnlPlayer2FaceDownCards.add(imgPlayer2Back18, new org.netbeans.lib.awtextra.AbsoluteConstraints(283, 93, -1, -1));
+
+        imgPlayer2Back19.setIcon(new javax.swing.ImageIcon(getClass().getResource("/uno_face_down_cards.png"))); // NOI18N
+        pnlPlayer2FaceDownCards.add(imgPlayer2Back19, new org.netbeans.lib.awtextra.AbsoluteConstraints(321, 93, -1, -1));
+
+        imgPlayer2Back20.setIcon(new javax.swing.ImageIcon(getClass().getResource("/uno_face_down_cards.png"))); // NOI18N
+        pnlPlayer2FaceDownCards.add(imgPlayer2Back20, new org.netbeans.lib.awtextra.AbsoluteConstraints(359, 93, -1, -1));
+
+        imgPlayer2Back1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/uno_face_down_cards.png"))); // NOI18N
+        pnlPlayer2FaceDownCards.add(imgPlayer2Back1, new org.netbeans.lib.awtextra.AbsoluteConstraints(15, 33, -1, -1));
+
+        imgPlayer2Back11.setIcon(new javax.swing.ImageIcon(getClass().getResource("/uno_face_down_cards.png"))); // NOI18N
+        pnlPlayer2FaceDownCards.add(imgPlayer2Back11, new org.netbeans.lib.awtextra.AbsoluteConstraints(17, 93, -1, -1));
+
+        lblPlayer1FaceDownCards1.setFont(new java.awt.Font("Arial Rounded MT Bold", 1, 18)); // NOI18N
+        lblPlayer1FaceDownCards1.setText("Player 2 Cards: ");
+        pnlPlayer2FaceDownCards.add(lblPlayer1FaceDownCards1, new org.netbeans.lib.awtextra.AbsoluteConstraints(15, 6, -1, -1));
+
+        lblPlayer2FaceDownCardsCount.setFont(new java.awt.Font("Arial Rounded MT Bold", 1, 18)); // NOI18N
+        lblPlayer2FaceDownCardsCount.setText("0");
+        pnlPlayer2FaceDownCards.add(lblPlayer2FaceDownCardsCount, new org.netbeans.lib.awtextra.AbsoluteConstraints(330, 6, 61, -1));
+
+        pnlPlayer3FaceDownCards.setBackground(new java.awt.Color(255, 153, 0));
+        pnlPlayer3FaceDownCards.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
+
+        imgPlayer3Back2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/uno_face_down_cards.png"))); // NOI18N
+        pnlPlayer3FaceDownCards.add(imgPlayer3Back2, new org.netbeans.lib.awtextra.AbsoluteConstraints(53, 33, -1, -1));
+
+        imgPlayer3Back3.setIcon(new javax.swing.ImageIcon(getClass().getResource("/uno_face_down_cards.png"))); // NOI18N
+        pnlPlayer3FaceDownCards.add(imgPlayer3Back3, new org.netbeans.lib.awtextra.AbsoluteConstraints(91, 33, -1, -1));
+
+        imgPlayer3Back4.setIcon(new javax.swing.ImageIcon(getClass().getResource("/uno_face_down_cards.png"))); // NOI18N
+        pnlPlayer3FaceDownCards.add(imgPlayer3Back4, new org.netbeans.lib.awtextra.AbsoluteConstraints(129, 33, -1, -1));
+
+        imgPlayer3Back5.setIcon(new javax.swing.ImageIcon(getClass().getResource("/uno_face_down_cards.png"))); // NOI18N
+        pnlPlayer3FaceDownCards.add(imgPlayer3Back5, new org.netbeans.lib.awtextra.AbsoluteConstraints(167, 33, -1, -1));
+
+        imgPlayer3Back6.setIcon(new javax.swing.ImageIcon(getClass().getResource("/uno_face_down_cards.png"))); // NOI18N
+        pnlPlayer3FaceDownCards.add(imgPlayer3Back6, new org.netbeans.lib.awtextra.AbsoluteConstraints(205, 33, -1, -1));
+
+        imgPlayer3Back7.setIcon(new javax.swing.ImageIcon(getClass().getResource("/uno_face_down_cards.png"))); // NOI18N
+        pnlPlayer3FaceDownCards.add(imgPlayer3Back7, new org.netbeans.lib.awtextra.AbsoluteConstraints(243, 33, -1, -1));
+
+        imgPlayer3Back8.setIcon(new javax.swing.ImageIcon(getClass().getResource("/uno_face_down_cards.png"))); // NOI18N
+        pnlPlayer3FaceDownCards.add(imgPlayer3Back8, new org.netbeans.lib.awtextra.AbsoluteConstraints(281, 33, -1, -1));
+
+        imgPlayer3Back9.setIcon(new javax.swing.ImageIcon(getClass().getResource("/uno_face_down_cards.png"))); // NOI18N
+        pnlPlayer3FaceDownCards.add(imgPlayer3Back9, new org.netbeans.lib.awtextra.AbsoluteConstraints(319, 33, -1, -1));
+
+        imgPlayer3Back10.setIcon(new javax.swing.ImageIcon(getClass().getResource("/uno_face_down_cards.png"))); // NOI18N
+        pnlPlayer3FaceDownCards.add(imgPlayer3Back10, new org.netbeans.lib.awtextra.AbsoluteConstraints(357, 33, -1, -1));
+
+        imgPlayer3Back12.setIcon(new javax.swing.ImageIcon(getClass().getResource("/uno_face_down_cards.png"))); // NOI18N
+        pnlPlayer3FaceDownCards.add(imgPlayer3Back12, new org.netbeans.lib.awtextra.AbsoluteConstraints(55, 93, -1, -1));
+
+        imgPlayer3Back13.setIcon(new javax.swing.ImageIcon(getClass().getResource("/uno_face_down_cards.png"))); // NOI18N
+        pnlPlayer3FaceDownCards.add(imgPlayer3Back13, new org.netbeans.lib.awtextra.AbsoluteConstraints(93, 93, -1, -1));
+
+        imgPlayer3Back14.setIcon(new javax.swing.ImageIcon(getClass().getResource("/uno_face_down_cards.png"))); // NOI18N
+        pnlPlayer3FaceDownCards.add(imgPlayer3Back14, new org.netbeans.lib.awtextra.AbsoluteConstraints(131, 93, -1, -1));
+
+        imgPlayer3Back15.setIcon(new javax.swing.ImageIcon(getClass().getResource("/uno_face_down_cards.png"))); // NOI18N
+        pnlPlayer3FaceDownCards.add(imgPlayer3Back15, new org.netbeans.lib.awtextra.AbsoluteConstraints(169, 93, -1, -1));
+
+        imgPlayer3Back16.setIcon(new javax.swing.ImageIcon(getClass().getResource("/uno_face_down_cards.png"))); // NOI18N
+        pnlPlayer3FaceDownCards.add(imgPlayer3Back16, new org.netbeans.lib.awtextra.AbsoluteConstraints(207, 93, -1, -1));
+
+        imgPlayer3Back17.setIcon(new javax.swing.ImageIcon(getClass().getResource("/uno_face_down_cards.png"))); // NOI18N
+        pnlPlayer3FaceDownCards.add(imgPlayer3Back17, new org.netbeans.lib.awtextra.AbsoluteConstraints(245, 93, -1, -1));
+
+        imgPlayer3Back18.setIcon(new javax.swing.ImageIcon(getClass().getResource("/uno_face_down_cards.png"))); // NOI18N
+        pnlPlayer3FaceDownCards.add(imgPlayer3Back18, new org.netbeans.lib.awtextra.AbsoluteConstraints(283, 93, -1, -1));
+
+        imgPlayer3Back19.setIcon(new javax.swing.ImageIcon(getClass().getResource("/uno_face_down_cards.png"))); // NOI18N
+        pnlPlayer3FaceDownCards.add(imgPlayer3Back19, new org.netbeans.lib.awtextra.AbsoluteConstraints(321, 93, -1, -1));
+
+        imgPlayer3Back20.setIcon(new javax.swing.ImageIcon(getClass().getResource("/uno_face_down_cards.png"))); // NOI18N
+        pnlPlayer3FaceDownCards.add(imgPlayer3Back20, new org.netbeans.lib.awtextra.AbsoluteConstraints(359, 93, -1, -1));
+
+        imgPlayer3Back1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/uno_face_down_cards.png"))); // NOI18N
+        pnlPlayer3FaceDownCards.add(imgPlayer3Back1, new org.netbeans.lib.awtextra.AbsoluteConstraints(15, 33, -1, -1));
+
+        imgPlayer3Back11.setIcon(new javax.swing.ImageIcon(getClass().getResource("/uno_face_down_cards.png"))); // NOI18N
+        pnlPlayer3FaceDownCards.add(imgPlayer3Back11, new org.netbeans.lib.awtextra.AbsoluteConstraints(17, 93, -1, -1));
+
+        lblPlayer1FaceDownCards2.setFont(new java.awt.Font("Arial Rounded MT Bold", 1, 18)); // NOI18N
+        lblPlayer1FaceDownCards2.setText("Player 3 Cards: ");
+        pnlPlayer3FaceDownCards.add(lblPlayer1FaceDownCards2, new org.netbeans.lib.awtextra.AbsoluteConstraints(15, 6, -1, -1));
+
+        lblPlayer3FaceDownCardsCount.setFont(new java.awt.Font("Arial Rounded MT Bold", 1, 18)); // NOI18N
+        lblPlayer3FaceDownCardsCount.setText("0");
+        pnlPlayer3FaceDownCards.add(lblPlayer3FaceDownCardsCount, new org.netbeans.lib.awtextra.AbsoluteConstraints(330, 6, 61, -1));
+
+        pnlPlayer4FaceDownCards.setBackground(new java.awt.Color(102, 102, 255));
+        pnlPlayer4FaceDownCards.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
+
+        imgPlayer4Back2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/uno_face_down_cards.png"))); // NOI18N
+        pnlPlayer4FaceDownCards.add(imgPlayer4Back2, new org.netbeans.lib.awtextra.AbsoluteConstraints(53, 33, -1, -1));
+
+        imgPlayer4Back3.setIcon(new javax.swing.ImageIcon(getClass().getResource("/uno_face_down_cards.png"))); // NOI18N
+        pnlPlayer4FaceDownCards.add(imgPlayer4Back3, new org.netbeans.lib.awtextra.AbsoluteConstraints(91, 33, -1, -1));
+
+        imgPlayer4Back4.setIcon(new javax.swing.ImageIcon(getClass().getResource("/uno_face_down_cards.png"))); // NOI18N
+        pnlPlayer4FaceDownCards.add(imgPlayer4Back4, new org.netbeans.lib.awtextra.AbsoluteConstraints(129, 33, -1, -1));
+
+        imgPlayer4Back5.setIcon(new javax.swing.ImageIcon(getClass().getResource("/uno_face_down_cards.png"))); // NOI18N
+        pnlPlayer4FaceDownCards.add(imgPlayer4Back5, new org.netbeans.lib.awtextra.AbsoluteConstraints(167, 33, -1, -1));
+
+        imgPlayer4Back6.setIcon(new javax.swing.ImageIcon(getClass().getResource("/uno_face_down_cards.png"))); // NOI18N
+        pnlPlayer4FaceDownCards.add(imgPlayer4Back6, new org.netbeans.lib.awtextra.AbsoluteConstraints(205, 33, -1, -1));
+
+        imgPlayer4Back7.setIcon(new javax.swing.ImageIcon(getClass().getResource("/uno_face_down_cards.png"))); // NOI18N
+        pnlPlayer4FaceDownCards.add(imgPlayer4Back7, new org.netbeans.lib.awtextra.AbsoluteConstraints(243, 33, -1, -1));
+
+        imgPlayer4Back8.setIcon(new javax.swing.ImageIcon(getClass().getResource("/uno_face_down_cards.png"))); // NOI18N
+        pnlPlayer4FaceDownCards.add(imgPlayer4Back8, new org.netbeans.lib.awtextra.AbsoluteConstraints(281, 33, -1, -1));
+
+        imgPlayer4Back9.setIcon(new javax.swing.ImageIcon(getClass().getResource("/uno_face_down_cards.png"))); // NOI18N
+        pnlPlayer4FaceDownCards.add(imgPlayer4Back9, new org.netbeans.lib.awtextra.AbsoluteConstraints(319, 33, -1, -1));
+
+        imgPlayer4Back10.setIcon(new javax.swing.ImageIcon(getClass().getResource("/uno_face_down_cards.png"))); // NOI18N
+        pnlPlayer4FaceDownCards.add(imgPlayer4Back10, new org.netbeans.lib.awtextra.AbsoluteConstraints(357, 33, -1, -1));
+
+        imgPlayer4Back12.setIcon(new javax.swing.ImageIcon(getClass().getResource("/uno_face_down_cards.png"))); // NOI18N
+        pnlPlayer4FaceDownCards.add(imgPlayer4Back12, new org.netbeans.lib.awtextra.AbsoluteConstraints(55, 93, -1, -1));
+
+        imgPlayer4Back13.setIcon(new javax.swing.ImageIcon(getClass().getResource("/uno_face_down_cards.png"))); // NOI18N
+        pnlPlayer4FaceDownCards.add(imgPlayer4Back13, new org.netbeans.lib.awtextra.AbsoluteConstraints(93, 93, -1, -1));
+
+        imgPlayer4Back14.setIcon(new javax.swing.ImageIcon(getClass().getResource("/uno_face_down_cards.png"))); // NOI18N
+        pnlPlayer4FaceDownCards.add(imgPlayer4Back14, new org.netbeans.lib.awtextra.AbsoluteConstraints(131, 93, -1, -1));
+
+        imgPlayer4Back15.setIcon(new javax.swing.ImageIcon(getClass().getResource("/uno_face_down_cards.png"))); // NOI18N
+        pnlPlayer4FaceDownCards.add(imgPlayer4Back15, new org.netbeans.lib.awtextra.AbsoluteConstraints(169, 93, -1, -1));
+
+        imgPlayer4Back16.setIcon(new javax.swing.ImageIcon(getClass().getResource("/uno_face_down_cards.png"))); // NOI18N
+        pnlPlayer4FaceDownCards.add(imgPlayer4Back16, new org.netbeans.lib.awtextra.AbsoluteConstraints(207, 93, -1, -1));
+
+        imgPlayer4Back17.setIcon(new javax.swing.ImageIcon(getClass().getResource("/uno_face_down_cards.png"))); // NOI18N
+        pnlPlayer4FaceDownCards.add(imgPlayer4Back17, new org.netbeans.lib.awtextra.AbsoluteConstraints(245, 93, -1, -1));
+
+        imgPlayer4Back18.setIcon(new javax.swing.ImageIcon(getClass().getResource("/uno_face_down_cards.png"))); // NOI18N
+        pnlPlayer4FaceDownCards.add(imgPlayer4Back18, new org.netbeans.lib.awtextra.AbsoluteConstraints(283, 93, -1, -1));
+
+        imgPlayer4Back19.setIcon(new javax.swing.ImageIcon(getClass().getResource("/uno_face_down_cards.png"))); // NOI18N
+        pnlPlayer4FaceDownCards.add(imgPlayer4Back19, new org.netbeans.lib.awtextra.AbsoluteConstraints(321, 93, -1, -1));
+
+        imgPlayer4Back20.setIcon(new javax.swing.ImageIcon(getClass().getResource("/uno_face_down_cards.png"))); // NOI18N
+        pnlPlayer4FaceDownCards.add(imgPlayer4Back20, new org.netbeans.lib.awtextra.AbsoluteConstraints(359, 93, -1, -1));
+
+        imgPlayer4Back1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/uno_face_down_cards.png"))); // NOI18N
+        pnlPlayer4FaceDownCards.add(imgPlayer4Back1, new org.netbeans.lib.awtextra.AbsoluteConstraints(15, 33, -1, -1));
+
+        imgPlayer4Back11.setIcon(new javax.swing.ImageIcon(getClass().getResource("/uno_face_down_cards.png"))); // NOI18N
+        pnlPlayer4FaceDownCards.add(imgPlayer4Back11, new org.netbeans.lib.awtextra.AbsoluteConstraints(17, 93, -1, -1));
+
+        lblPlayer1FaceDownCards3.setFont(new java.awt.Font("Arial Rounded MT Bold", 1, 18)); // NOI18N
+        lblPlayer1FaceDownCards3.setText("Player 4 Cards: ");
+        pnlPlayer4FaceDownCards.add(lblPlayer1FaceDownCards3, new org.netbeans.lib.awtextra.AbsoluteConstraints(15, 6, -1, -1));
+
+        lblPlayer4FaceDownCardsCount.setFont(new java.awt.Font("Arial Rounded MT Bold", 1, 18)); // NOI18N
+        lblPlayer4FaceDownCardsCount.setText("0");
+        pnlPlayer4FaceDownCards.add(lblPlayer4FaceDownCardsCount, new org.netbeans.lib.awtextra.AbsoluteConstraints(330, 6, 61, -1));
+
+        jLabel5.setFont(new java.awt.Font("Arial Rounded MT Bold", 1, 48)); // NOI18N
+        jLabel5.setForeground(new java.awt.Color(255, 0, 51));
+        jLabel5.setText("U");
+
+        jLabel6.setFont(new java.awt.Font("Arial Rounded MT Bold", 1, 48)); // NOI18N
+        jLabel6.setForeground(new java.awt.Color(51, 51, 255));
+        jLabel6.setText("N");
+
+        jLabel9.setFont(new java.awt.Font("Arial Rounded MT Bold", 1, 48)); // NOI18N
+        jLabel9.setForeground(new java.awt.Color(255, 0, 255));
+        jLabel9.setText("O");
 
         javax.swing.GroupLayout pnlLiveGameLayout = new javax.swing.GroupLayout(pnlLiveGame);
         pnlLiveGame.setLayout(pnlLiveGameLayout);
@@ -1331,85 +1195,115 @@ public class LiveGameWin extends javax.swing.JFrame {
             .addGroup(pnlLiveGameLayout.createSequentialGroup()
                 .addGroup(pnlLiveGameLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(pnlLiveGameLayout.createSequentialGroup()
+                        .addGap(14, 14, 14)
+                        .addGroup(pnlLiveGameLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(lblondeck, javax.swing.GroupLayout.PREFERRED_SIZE, 147, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(lblCurrent, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 164, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(pnlLiveGameLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                            .addComponent(lblNextPlayer, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(lblCurrentPlayer, javax.swing.GroupLayout.DEFAULT_SIZE, 147, Short.MAX_VALUE)))
+                    .addGroup(pnlLiveGameLayout.createSequentialGroup()
                         .addContainerGap()
                         .addGroup(pnlLiveGameLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(btnHelp, javax.swing.GroupLayout.PREFERRED_SIZE, 230, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(jLabel8)
                             .addGroup(pnlLiveGameLayout.createSequentialGroup()
                                 .addGap(6, 6, 6)
-                                .addComponent(jLabel7, javax.swing.GroupLayout.PREFERRED_SIZE, 173, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                                .addComponent(jLabel7, javax.swing.GroupLayout.PREFERRED_SIZE, 173, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                .addGroup(pnlLiveGameLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(pnlLiveGameLayout.createSequentialGroup()
-                        .addContainerGap()
-                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 309, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(pnlLiveGameLayout.createSequentialGroup()
-                        .addGap(14, 14, 14)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(pnlLiveGameLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(lblNextPlayer, javax.swing.GroupLayout.PREFERRED_SIZE, 277, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(lblCurrentPlayer, javax.swing.GroupLayout.PREFERRED_SIZE, 277, javax.swing.GroupLayout.PREFERRED_SIZE))))
-                .addGroup(pnlLiveGameLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(pnlLiveGameLayout.createSequentialGroup()
+                                .addGap(45, 45, 45)
+                                .addComponent(jLabel4, javax.swing.GroupLayout.PREFERRED_SIZE, 131, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(30, 30, 30)
+                                .addComponent(lblCurrentColor, javax.swing.GroupLayout.PREFERRED_SIZE, 129, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addGroup(pnlLiveGameLayout.createSequentialGroup()
+                                .addGap(108, 108, 108)
+                                .addComponent(jLabel3))
+                            .addGroup(pnlLiveGameLayout.createSequentialGroup()
+                                .addGap(34, 34, 34)
+                                .addComponent(jLabel1))))
                     .addGroup(pnlLiveGameLayout.createSequentialGroup()
-                        .addComponent(jLabel1)
-                        .addGap(0, 0, Short.MAX_VALUE))
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, pnlLiveGameLayout.createSequentialGroup()
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(jLabel3)
-                        .addGap(196, 196, 196))
-                    .addGroup(pnlLiveGameLayout.createSequentialGroup()
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 25, Short.MAX_VALUE)))
+                        .addGap(95, 95, 95)
+                        .addComponent(jLabel5)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jLabel6)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jLabel9)))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 63, Short.MAX_VALUE)
                 .addGroup(pnlLiveGameLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(pnlPlayer4FaceDownCards, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(pnlPlayer1FaceDownCards, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(pnlPlayer2FaceDownCards, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(pnlPlayer3FaceDownCards, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(pnlPlayer1FaceDownCards, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(26, Short.MAX_VALUE))
+                    .addComponent(pnlPlayer4FaceDownCards, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(227, 227, 227))
         );
         pnlLiveGameLayout.setVerticalGroup(
             pnlLiveGameLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(pnlLiveGameLayout.createSequentialGroup()
-                .addComponent(pnlPlayer1FaceDownCards, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(pnlPlayer2FaceDownCards, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(18, 18, 18)
-                .addComponent(pnlPlayer3FaceDownCards, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(pnlPlayer4FaceDownCards, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(0, 0, Short.MAX_VALUE))
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, pnlLiveGameLayout.createSequentialGroup()
-                .addGap(8, 8, 8)
-                .addGroup(pnlLiveGameLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel1)
-                    .addComponent(btnHelp, javax.swing.GroupLayout.PREFERRED_SIZE, 53, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addGroup(pnlLiveGameLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(pnlLiveGameLayout.createSequentialGroup()
-                        .addGap(74, 74, 74)
-                        .addComponent(jLabel3)
-                        .addGap(21, 21, 21)
-                        .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addComponent(jLabel1)
+                        .addGap(7, 7, 7)
+                        .addGroup(pnlLiveGameLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addGroup(pnlLiveGameLayout.createSequentialGroup()
+                                .addGroup(pnlLiveGameLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                    .addComponent(jLabel5)
+                                    .addComponent(jLabel6)
+                                    .addComponent(jLabel9))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addGroup(pnlLiveGameLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                    .addComponent(lblCurrentColor)
+                                    .addComponent(jLabel4))
+                                .addGap(18, 18, 18)
+                                .addComponent(jLabel3))
+                            .addComponent(pnlPlayer1FaceDownCards, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(pnlLiveGameLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(pnlLiveGameLayout.createSequentialGroup()
+                                .addComponent(pnlPlayer2FaceDownCards, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(pnlPlayer3FaceDownCards, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(pnlPlayer4FaceDownCards, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
                     .addGroup(pnlLiveGameLayout.createSequentialGroup()
+                        .addComponent(btnHelp, javax.swing.GroupLayout.PREFERRED_SIZE, 53, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(jLabel7)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(jLabel8)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 461, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(27, 27, 27)
-                        .addComponent(lblCurrentPlayer, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 493, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addGroup(pnlLiveGameLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(lblCurrentPlayer, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(lblCurrent, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(lblNextPlayer, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addGroup(pnlLiveGameLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(lblNextPlayer, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(lblondeck, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                .addContainerGap())
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(pnlLiveGame, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(pnlLiveGame, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(pnlLiveGame, javax.swing.GroupLayout.PREFERRED_SIZE, 695, javax.swing.GroupLayout.PREFERRED_SIZE)
+            .addComponent(pnlLiveGame, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
         );
 
         pack();
@@ -1420,16 +1314,6 @@ public class LiveGameWin extends javax.swing.JFrame {
         HelpWin helpwin = new HelpWin();
         helpwin.setVisible(true);
     }//GEN-LAST:event_btnHelpActionPerformed
-
-    private void btnForfeitActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnForfeitActionPerformed
-        // TODO add your handling code here:
-        int choice = JOptionPane.showConfirmDialog(null, "Are you sure you want to forfeit?", "Forfeit?", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
-        if (choice == JOptionPane.YES_OPTION) {
-            System.exit(0);
-        } else {
-            return;
-        }
-    }//GEN-LAST:event_btnForfeitActionPerformed
 
     private void btnQuitGameActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnQuitGameActionPerformed
         // TODO add your handling code here:
@@ -1482,6 +1366,56 @@ public class LiveGameWin extends javax.swing.JFrame {
         // TODO add your handling code here:
         playCard(7);
     }//GEN-LAST:event_btnCardSlot7ActionPerformed
+
+    private void btnForfeitActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnForfeitActionPerformed
+        // TODO add your handling code here:
+        int choice = JOptionPane.showConfirmDialog(null, "Are you sure you want to forfeit?", "Forfeit?", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
+        if (choice == JOptionPane.YES_OPTION) {
+            System.exit(0);
+        } else {
+            return;
+        }
+    }//GEN-LAST:event_btnForfeitActionPerformed
+
+    private void btnCardSlot8ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCardSlot8ActionPerformed
+        // TODO add your handling code here:
+        playCard(8);
+    }//GEN-LAST:event_btnCardSlot8ActionPerformed
+
+    private void btnCardSlot9ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCardSlot9ActionPerformed
+        // TODO add your handling code here:
+        playCard(9);
+    }//GEN-LAST:event_btnCardSlot9ActionPerformed
+
+    private void btnCardSlot10ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCardSlot10ActionPerformed
+        // TODO add your handling code here:
+        playCard(10);
+    }//GEN-LAST:event_btnCardSlot10ActionPerformed
+
+    private void btnCardSlot11ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCardSlot11ActionPerformed
+        // TODO add your handling code here:
+        playCard(11);
+    }//GEN-LAST:event_btnCardSlot11ActionPerformed
+
+    private void btnCardSlot12ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCardSlot12ActionPerformed
+        // TODO add your handling code here:
+        playCard(12);
+    }//GEN-LAST:event_btnCardSlot12ActionPerformed
+
+    private void btnCardSlot13ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCardSlot13ActionPerformed
+        // TODO add your handling code here:
+        playCard(13);
+    }//GEN-LAST:event_btnCardSlot13ActionPerformed
+
+    private void btnCardSlot14ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCardSlot14ActionPerformed
+        // TODO add your handling code here:
+        playCard(14);
+    }//GEN-LAST:event_btnCardSlot14ActionPerformed
+
+    private void btnCardSlot15ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCardSlot15ActionPerformed
+        // TODO add your handling code here:
+        playCard(15);
+    }//GEN-LAST:event_btnCardSlot15ActionPerformed
 
     
     /**
@@ -1629,23 +1563,30 @@ public class LiveGameWin extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
+    private javax.swing.JLabel jLabel4;
+    private javax.swing.JLabel jLabel5;
+    private javax.swing.JLabel jLabel6;
     private javax.swing.JLabel jLabel7;
     private javax.swing.JLabel jLabel8;
+    private javax.swing.JLabel jLabel9;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
     private javax.swing.JPanel jPanel84;
     private javax.swing.JPanel jPanel85;
     private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JLabel lblCurrent;
+    private javax.swing.JLabel lblCurrentColor;
     private javax.swing.JLabel lblCurrentPlayer;
     private javax.swing.JLabel lblNextPlayer;
     private javax.swing.JLabel lblPlayer1FaceDownCards;
+    private javax.swing.JLabel lblPlayer1FaceDownCards1;
+    private javax.swing.JLabel lblPlayer1FaceDownCards2;
+    private javax.swing.JLabel lblPlayer1FaceDownCards3;
     private javax.swing.JLabel lblPlayer1FaceDownCardsCount;
-    private javax.swing.JLabel lblPlayer2FaceDownCards;
     private javax.swing.JLabel lblPlayer2FaceDownCardsCount;
-    private javax.swing.JLabel lblPlayer3FaceDownCards;
     private javax.swing.JLabel lblPlayer3FaceDownCardsCount;
-    private javax.swing.JLabel lblPlayer4FaceDownCards;
     private javax.swing.JLabel lblPlayer4FaceDownCardsCount;
+    private javax.swing.JLabel lblondeck;
     private javax.swing.JPanel pnlLiveGame;
     private javax.swing.JPanel pnlPlayer1FaceDownCards;
     private javax.swing.JPanel pnlPlayer2FaceDownCards;

@@ -48,7 +48,7 @@ public class Draw2Card extends Card {
     
     @Override
     public boolean isSkip(){
-        return false;
+        return true;
     }
     
     @Override
@@ -68,7 +68,7 @@ public class Draw2Card extends Card {
     
     @Override
     public void declareColor(String color){
-        
+        return;
     }
     
     public String getImageName(){

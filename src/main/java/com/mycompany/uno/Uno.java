@@ -4,6 +4,10 @@
  */
 package com.mycompany.uno;
 
+import com.sun.net.httpserver.HttpServer;
+import java.io.IOException;
+import java.net.InetSocketAddress;
+import java.util.concurrent.Executors;
 import javax.swing.JOptionPane;
 
 /**
@@ -138,6 +142,11 @@ public class Uno extends javax.swing.JFrame {
         }
         //</editor-fold>
         //</editor-fold>
+        GameRegistry gameRegistry = new GameRegistry();
+        
+        GameAPI gameAPI = new GameAPI(gameRegistry);
+        
+        gameAPI.startServer();
 
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
