@@ -12,13 +12,13 @@ import java.util.ArrayList;
  */
 public class Player {
     private ArrayList<Card> cards;
-    private int playerNumber;
     private String playerName;
-    private boolean currentPlayer;
     private Player previousPlayer;
     private Player nextPlayer;
-    private int numberOfPlayers;
     private Deck deck;
+    private int numberOfPlayers;
+    private int playerNumber;
+    private boolean currentPlayer;
     
     public Player(String playerName, int playerNumber, int numberOfPlayers, Deck deck){
         this.playerNumber = playerNumber;
@@ -27,18 +27,12 @@ public class Player {
         this.cards = new ArrayList<Card>();
         this.deck = deck;
         this.generateRandomDecks();
-        //debug
-        System.out.println("Player " + this.playerNumber + "(" + this.playerName + ")" +  ": " + this.cards);
-        System.out.println("Number of cards in main pile: " + deck.getMainPile().size());
-//        System.out.println(this.playerNumber);
-//        System.out.println(this.cards);
     }
    
-    
+    // Getters
     public String getName() {
         return this.playerName; // Assuming you have a 'name' field
     }
-
     
     public int getCurrentPlayerDeckSize(){
         int size = this.cards.size();
@@ -49,15 +43,6 @@ public class Player {
         return this.cards;
     }
     
-    public void generateRandomDecks(){
-        // Simulate the drawing pattern, alternates
-        
-        for(int i = 0; i < 7; i++){
-            Card card = this.deck.getNextMainPileCard();
-            this.cards.add(card);
-        }
-    }
-    
     public int getPlayerNumber() {
         return this.playerNumber;
     }
@@ -66,19 +51,26 @@ public class Player {
         return this.playerNumber - 1;
     }
     
+    
+    // Action methods
+    public void generateRandomDecks(){
+        for(int i = 0; i < 7; i++){
+            Card card = this.deck.getNextMainPileCard();
+            this.cards.add(card);
+        }
+    }
+    
     public void removeCard(Card removeCard) {
         for (int i = 0; i < this.cards.size(); i++) {
             if (this.cards.get(i) == removeCard) {
-                // removing the card
                 this.cards.remove(i);
             }
         }
     }
     
     public void addNewCards(int totalCards) {
-        //
         // This adds additional cards to the deck
-        //
+        // Draw two, draw four, etc...
         for(int i = 0; i < totalCards; i++){
             Card card = this.deck.getNextMainPileCard();
             this.cards.add(card);
@@ -89,5 +81,4 @@ public class Player {
     public String toString(){
         return this.playerName;
     }
-
 }

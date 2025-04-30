@@ -149,18 +149,14 @@ public class Game {
                 this.nextIndex += 1;
                 this.nextPlayer = players.get(nextIndex);
             }
-        }else{
-            System.out.println(nextIndex - 1);
-            if(nextIndex - 2 < 0){
-                this.nextIndex = players.size() - 1;
-                this.currentPlayer = players.get(nextIndex);
-                this.nextPlayer = players.get(players.size() - 2);
+        } else {
+            if (nextIndex - 1 < 0) {
+                nextIndex = players.size() - 1;
+            } else {
+                nextIndex -= 1;
             }
-            else{
-                this.nextIndex -= 1;
-                this.currentPlayer = players.get(nextIndex);
-                this.nextPlayer = players.get(nextIndex - 1);
-            }
+            currentPlayer = players.get(nextIndex);
+            nextPlayer = players.get((nextIndex - 1 + players.size()) % players.size());
         }
 //        System.out.println("previous player: "  + previousPlayer);
 //        System.out.println("current player: " + currentPlayer);

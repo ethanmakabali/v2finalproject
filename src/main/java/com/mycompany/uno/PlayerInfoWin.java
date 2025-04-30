@@ -51,7 +51,11 @@ public class PlayerInfoWin extends javax.swing.JFrame {
     }
     
     
-    private boolean checkValidName(){
+    private boolean checkValidName() {
+        if (numberOfPlayers >= 1 && jtfName1.getText().trim().isEmpty()) return false;
+        if (numberOfPlayers >= 2 && jtfName2.getText().trim().isEmpty()) return false;
+        if (numberOfPlayers >= 3 && jtfName3.getText().trim().isEmpty()) return false;
+        if (numberOfPlayers == 4 && jtfName4.getText().trim().isEmpty()) return false;
         return true;
     }
     
@@ -170,6 +174,11 @@ public class PlayerInfoWin extends javax.swing.JFrame {
         jButton2.setBackground(new java.awt.Color(255, 0, 51));
         jButton2.setFont(new java.awt.Font("Arial Rounded MT Bold", 1, 14)); // NOI18N
         jButton2.setText("Return to Main Menu");
+        jButton2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton2ActionPerformed(evt);
+            }
+        });
         jPanel1.add(jButton2, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 570, 220, 50));
 
         lblName5.setFont(new java.awt.Font("Lucida Sans", 1, 24)); // NOI18N
@@ -196,12 +205,12 @@ public class PlayerInfoWin extends javax.swing.JFrame {
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
         // TODO add your handling code here:
-        setPlayerNames(); // if you put in the constructor, its too early
         boolean flag = checkValidName();
         if(flag == false){
-            JOptionPane.showMessageDialog(null, "You must enter a name to play!", "Warning", JOptionPane.WARNING_MESSAGE);
+            JOptionPane.showMessageDialog(null, "All players need a name!", "Warning", JOptionPane.WARNING_MESSAGE);
         }
         else{
+            setPlayerNames(); 
             ArrayList<String>names = getPlayerNames();
             LiveGameWin win = new LiveGameWin(numberOfPlayers, names);
             win.setVisible(true);
@@ -212,6 +221,13 @@ public class PlayerInfoWin extends javax.swing.JFrame {
     private void jtfName1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jtfName1ActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_jtfName1ActionPerformed
+
+    private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
+        // TODO add your handling code here:
+        this.dispose();
+        Uno homepage = new Uno();
+        homepage.setVisible(true);
+    }//GEN-LAST:event_jButton2ActionPerformed
 
     /**
      * @param args the command line arguments

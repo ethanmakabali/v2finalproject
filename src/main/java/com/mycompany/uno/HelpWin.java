@@ -36,10 +36,12 @@ public class HelpWin extends javax.swing.JFrame {
         jLabel4 = new javax.swing.JLabel();
         btnOk = new javax.swing.JButton();
         jLabel5 = new javax.swing.JLabel();
-        jPanel3 = new javax.swing.JPanel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
+        pnlHelp.setBackground(new java.awt.Color(204, 0, 255));
+
+        jPanel2.setBackground(new java.awt.Color(102, 255, 204));
         jPanel2.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
         jLabel1.setFont(new java.awt.Font("Arial Rounded MT Bold", 1, 18)); // NOI18N
@@ -72,19 +74,6 @@ public class HelpWin extends javax.swing.JFrame {
         jPanel2.add(jLabel5, new org.netbeans.lib.awtextra.AbsoluteConstraints(6, 258, -1, -1));
 
         jTabbedPane1.addTab("Help", jPanel2);
-
-        javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
-        jPanel3.setLayout(jPanel3Layout);
-        jPanel3Layout.setHorizontalGroup(
-            jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 676, Short.MAX_VALUE)
-        );
-        jPanel3Layout.setVerticalGroup(
-            jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 500, Short.MAX_VALUE)
-        );
-
-        jTabbedPane1.addTab("How to play", jPanel3);
 
         javax.swing.GroupLayout pnlHelpLayout = new javax.swing.GroupLayout(pnlHelp);
         pnlHelp.setLayout(pnlHelpLayout);
@@ -159,7 +148,6 @@ public class HelpWin extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
     private javax.swing.JPanel jPanel2;
-    private javax.swing.JPanel jPanel3;
     private javax.swing.JTabbedPane jTabbedPane1;
     private javax.swing.JPanel pnlHelp;
     // End of variables declaration//GEN-END:variables

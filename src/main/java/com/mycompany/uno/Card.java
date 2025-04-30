@@ -12,7 +12,6 @@ import java.awt.Image;
  */
 public abstract class Card {
     protected String color;
-//    protected Image image; 
     
     public Card(String color){
         this.color = color;

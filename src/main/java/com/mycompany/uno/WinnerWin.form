@@ -40,8 +40,47 @@
         </Property>
       </Properties>
 
-      <Layout class="org.netbeans.modules.form.compat2.layouts.DesignAbsoluteLayout">
-        <Property name="useNullLayout" type="boolean" value="false"/>
+      <Layout>
+        <DimensionLayout dim="0">
+          <Group type="103" groupAlignment="0" attributes="0">
+              <Group type="102" attributes="0">
+                  <EmptySpace min="140" pref="140" max="-2" attributes="0"/>
+                  <Component id="jLabel1" min="-2" pref="510" max="-2" attributes="0"/>
+              </Group>
+              <Group type="102" attributes="0">
+                  <EmptySpace min="444" pref="444" max="-2" attributes="0"/>
+                  <Component id="jButton2" min="-2" pref="288" max="-2" attributes="0"/>
+              </Group>
+              <Group type="102" attributes="0">
+                  <EmptySpace min="97" pref="97" max="-2" attributes="0"/>
+                  <Component id="jButton1" min="-2" pref="245" max="-2" attributes="0"/>
+              </Group>
+              <Group type="102" attributes="0">
+                  <EmptySpace min="221" pref="221" max="-2" attributes="0"/>
+                  <Component id="lblWinnerWins" min="-2" pref="352" max="-2" attributes="0"/>
+              </Group>
+              <Component id="jLabel3" min="-2" pref="830" max="-2" attributes="0"/>
+          </Group>
+        </DimensionLayout>
+        <DimensionLayout dim="1">
+          <Group type="103" groupAlignment="0" attributes="0">
+              <Group type="102" attributes="0">
+                  <EmptySpace min="30" pref="30" max="-2" attributes="0"/>
+                  <Component id="jLabel1" min="-2" pref="89" max="-2" attributes="0"/>
+                  <EmptySpace min="280" pref="280" max="-2" attributes="0"/>
+                  <Component id="jButton2" min="-2" pref="59" max="-2" attributes="0"/>
+              </Group>
+              <Group type="102" attributes="0">
+                  <EmptySpace min="399" pref="399" max="-2" attributes="0"/>
+                  <Component id="jButton1" min="-2" pref="59" max="-2" attributes="0"/>
+              </Group>
+              <Group type="102" attributes="0">
+                  <EmptySpace min="122" pref="122" max="-2" attributes="0"/>
+                  <Component id="lblWinnerWins" min="-2" pref="89" max="-2" attributes="0"/>
+              </Group>
+              <Component id="jLabel3" min="-2" pref="510" max="-2" attributes="0"/>
+          </Group>
+        </DimensionLayout>
       </Layout>
       <SubComponents>
         <Component class="javax.swing.JLabel" name="jLabel1">
@@ -54,11 +93,6 @@
             </Property>
             <Property name="text" type="java.lang.String" value="We have a winner!!!"/>
           </Properties>
-          <Constraints>
-            <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.DesignAbsoluteLayout" value="org.netbeans.modules.form.compat2.layouts.DesignAbsoluteLayout$AbsoluteConstraintsDescription">
-              <AbsoluteConstraints x="140" y="30" width="510" height="89"/>
-            </Constraint>
-          </Constraints>
         </Component>
         <Component class="javax.swing.JLabel" name="lblWinnerWins">
           <Properties>
@@ -70,11 +104,6 @@
             </Property>
             <Property name="text" type="java.lang.String" value="(Name) Wins!"/>
           </Properties>
-          <Constraints>
-            <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.DesignAbsoluteLayout" value="org.netbeans.modules.form.compat2.layouts.DesignAbsoluteLayout$AbsoluteConstraintsDescription">
-              <AbsoluteConstraints x="221" y="122" width="352" height="89"/>
-            </Constraint>
-          </Constraints>
         </Component>
         <Component class="javax.swing.JButton" name="jButton1">
           <Properties>
@@ -83,11 +112,9 @@
             </Property>
             <Property name="text" type="java.lang.String" value="Play Again"/>
           </Properties>
-          <Constraints>
-            <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.DesignAbsoluteLayout" value="org.netbeans.modules.form.compat2.layouts.DesignAbsoluteLayout$AbsoluteConstraintsDescription">
-              <AbsoluteConstraints x="97" y="399" width="245" height="59"/>
-            </Constraint>
-          </Constraints>
+          <Events>
+            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jButton1ActionPerformed"/>
+          </Events>
         </Component>
         <Component class="javax.swing.JButton" name="jButton2">
           <Properties>
@@ -96,24 +123,17 @@
             </Property>
             <Property name="text" type="java.lang.String" value="Return to Main Menu"/>
           </Properties>
-          <Constraints>
-            <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.DesignAbsoluteLayout" value="org.netbeans.modules.form.compat2.layouts.DesignAbsoluteLayout$AbsoluteConstraintsDescription">
-              <AbsoluteConstraints x="444" y="399" width="288" height="59"/>
-            </Constraint>
-          </Constraints>
+          <Events>
+            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jButton2ActionPerformed"/>
+          </Events>
         </Component>
         <Component class="javax.swing.JLabel" name="jLabel3">
           <Properties>
             <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
-              <Image iconType="3" name="/purpleunobackground.png"/>
+              <Image iconType="3" name="/purple_background.png"/>
             </Property>
             <Property name="text" type="java.lang.String" value="jLabel3"/>
           </Properties>
-          <Constraints>
-            <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.DesignAbsoluteLayout" value="org.netbeans.modules.form.compat2.layouts.DesignAbsoluteLayout$AbsoluteConstraintsDescription">
-              <AbsoluteConstraints x="0" y="0" width="830" height="510"/>
-            </Constraint>
-          </Constraints>
         </Component>
       </SubComponents>
     </Container>

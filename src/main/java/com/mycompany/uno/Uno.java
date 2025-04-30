@@ -142,11 +142,6 @@ public class Uno extends javax.swing.JFrame {
         }
         //</editor-fold>
         //</editor-fold>
-        GameRegistry gameRegistry = new GameRegistry();
-        
-        GameAPI gameAPI = new GameAPI(gameRegistry);
-        
-        gameAPI.startServer();
 
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {

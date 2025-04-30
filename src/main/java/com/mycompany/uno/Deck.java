@@ -20,10 +20,32 @@ public class Deck {
         this.discardPile = new ArrayList<>();
         createMainPile();
         shuffleDeck();
-        System.out.println("number of cards in main pile: " + mainPile.size());
-        System.out.println(mainPile);
     }   
     
+    // Getters
+    public ArrayList<Card> getMainPile(){
+        return this.mainPile;
+    }
+    
+    public ArrayList<Card> getDiscardPile(){
+        return this.discardPile;
+    }
+    
+    public Card getDiscardCard() {
+        if (this.discardPile.isEmpty()){
+            this.discardPile.add(this.mainPile.get(0));
+            mainPile.remove(0);
+        }
+        return this.discardPile.get(this.discardPile.size() - 1);
+    }
+    
+    public Card getNextMainPileCard() {
+        Card card = mainPile.get(0);
+        mainPile.remove(0);
+        return card;
+    }
+    
+    // Action methods
     private void createMainPile(){
         //108 cards, in a tradiontal Uno deck;
         String[] colors = {"Red","Green","Blue","Yellow"};
@@ -60,30 +82,8 @@ public class Deck {
         Collections.shuffle(mainPile);
     }
     
-    public ArrayList<Card> getMainPile(){
-        return this.mainPile;
-    }
-    
-    public ArrayList<Card> getDiscardPile(){
-        return this.discardPile;
-    }
-    
-    public Card getDiscardCard() {
-        if (this.discardPile.isEmpty()){
-            this.discardPile.add(this.mainPile.get(0));
-            mainPile.remove(0);
-        }
-        return this.discardPile.get(this.discardPile.size() - 1);
-    }
-    
     public void placeDiscardCard(Card card) {
         this.discardPile.add(card);
-    }
-    
-    public Card getNextMainPileCard() {
-        Card card = mainPile.get(0);
-        mainPile.remove(0);
-        return card;
     }
 }
 

@@ -107,7 +107,7 @@ public class HideCardsWin extends javax.swing.JFrame {
         jLabel3.setText("(Click \"Continue\" when Ready)");
         jPanel1.add(jLabel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(44, 495, -1, -1));
 
-        jLabel4.setIcon(new javax.swing.ImageIcon(getClass().getResource("/starry.png"))); // NOI18N
+        jLabel4.setIcon(new javax.swing.ImageIcon(getClass().getResource("/starry_background.png"))); // NOI18N
         jLabel4.setText("jLabel4");
         jPanel1.add(jLabel4, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 290, 710));
 
