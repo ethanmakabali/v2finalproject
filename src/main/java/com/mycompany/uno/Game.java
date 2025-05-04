@@ -26,8 +26,6 @@ public class Game {
     // Game Logic
     private int nextIndex;
     private boolean clockWise;
-    private int turn;
-    private boolean forfeit;
     
     
     public Game(ArrayList<String> playerNames, Deck deck){
@@ -36,6 +34,7 @@ public class Game {
         this.numberOfPlayers = playerNames.size();
         this.playerNames = playerNames;
         assignPlayers();
+        
         this.currentPlayer = players.get(0);
         this.nextIndex = 1;
         this.nextPlayer = players.get(nextIndex);
@@ -52,6 +51,7 @@ public class Game {
         }
     }
     
+    // Getters
     public int getPlayerDeckSize(int playerNum) {
         return players.get(playerNum).getCurrentPlayerDeckSize();
     }
@@ -64,6 +64,48 @@ public class Game {
         return this.currentPlayer.getCurrentPlayerDeck();
     }
     
+    public int getCurrentPlayerIndex() {
+         return players.indexOf(currentPlayer);
+    }   
+    
+     public ArrayList<Player> getPlayers(){
+        return this.players;
+    }
+    
+    public Player getWinner(){
+        return this.winner;
+    }
+    
+    public Player getThisPlayer(int i){
+        return players.get(i);
+    }
+    
+    public Player getCurrentPlayer(){
+        return this.currentPlayer;
+    }
+    
+    public Player getNextPlayer(){
+        return this.nextPlayer;
+    }
+    
+    public Player getPreviousPlayer(){
+        return this.previousPlayer;
+    }
+    
+    public int getNumberOfPlayers() {
+        return this.numberOfPlayers;
+    }
+    
+    // Setters
+    public void setClockWise(boolean yesOrNo){
+        this.clockWise = yesOrNo;
+    }
+    
+    public void setNumberOfPlayers(int numPlayers){
+        this.numberOfPlayers = numPlayers;
+    }
+
+    // Condition Checking
     public boolean playCard(Card card, String declaredColor) {
         if (!this.deck.getDiscardPile().isEmpty()) {
             if (!card.canPlayCard(this.deck.getDiscardCard())) {
@@ -73,6 +115,7 @@ public class Game {
 
         if (card.isReverse()) {
             this.clockWise = !this.clockWise;
+            moveToNextPlayer();
         }
 
         if (card.isWildcard()) {
@@ -107,36 +150,7 @@ public class Game {
         return false;
     }
     
-
-    
-    public ArrayList<Player> getPlayers(){
-        return this.players;
-    }
-    
-    public Player getWinner(){
-        return this.winner;
-    }
-    
-    public Player getThisPlayer(int i){
-        return players.get(i);
-    }
-    
-    public Player getCurrentPlayer(){
-        return this.currentPlayer;
-    }
-    
-    public Player getNextPlayer(){
-        return this.nextPlayer;
-    }
-    
-    public Player getPreviousPlayer(){
-        return this.previousPlayer;
-    }
-    
-    public void setClockWise(boolean yesOrNo){
-        this.clockWise = yesOrNo;
-    }
-    
+    // Call this to rotate players
     public void moveToNextPlayer(){
         this.previousPlayer = currentPlayer;
         if(clockWise == true){
@@ -158,27 +172,6 @@ public class Game {
             currentPlayer = players.get(nextIndex);
             nextPlayer = players.get((nextIndex - 1 + players.size()) % players.size());
         }
-//        System.out.println("previous player: "  + previousPlayer);
-//        System.out.println("current player: " + currentPlayer);
-//        System.out.println("next player: " + nextPlayer);
-//        System.out.println("-----------------------------");
-    }
-    
-    
-    public void setNumberOfPlayers(int numPlayers){
-        this.numberOfPlayers = numPlayers;
-    }
-    
-    public int getNumberOfPlayers() {
-        return this.numberOfPlayers;
-    }
-    
-    public int getTurns() {
-        return this.turn;
-    }
-    
-    public boolean isForfeit() {
-        return this.forfeit;
     }
 }
 

@@ -28,37 +28,37 @@ public class HelpWin extends javax.swing.JFrame {
     private void initComponents() {
 
         pnlHelp = new javax.swing.JPanel();
-        jTabbedPane1 = new javax.swing.JTabbedPane();
-        jPanel2 = new javax.swing.JPanel();
-        jLabel1 = new javax.swing.JLabel();
-        jLabel2 = new javax.swing.JLabel();
-        jLabel3 = new javax.swing.JLabel();
-        jLabel4 = new javax.swing.JLabel();
+        tabbedHelp = new javax.swing.JTabbedPane();
+        pnlHelpInner = new javax.swing.JPanel();
+        lblWhatDoIDo = new javax.swing.JLabel();
+        lblDescription1 = new javax.swing.JLabel();
+        lblWildCards = new javax.swing.JLabel();
+        lblDescription2 = new javax.swing.JLabel();
         btnOk = new javax.swing.JButton();
-        jLabel5 = new javax.swing.JLabel();
+        lblDescription3 = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
         pnlHelp.setBackground(new java.awt.Color(204, 0, 255));
 
-        jPanel2.setBackground(new java.awt.Color(102, 255, 204));
-        jPanel2.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
+        pnlHelpInner.setBackground(new java.awt.Color(102, 255, 204));
+        pnlHelpInner.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
-        jLabel1.setFont(new java.awt.Font("Arial Rounded MT Bold", 1, 18)); // NOI18N
-        jLabel1.setText("What do I do?");
-        jPanel2.add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(6, 33, -1, -1));
+        lblWhatDoIDo.setFont(new java.awt.Font("Arial Rounded MT Bold", 1, 18)); // NOI18N
+        lblWhatDoIDo.setText("What do I do?");
+        pnlHelpInner.add(lblWhatDoIDo, new org.netbeans.lib.awtextra.AbsoluteConstraints(6, 33, -1, -1));
 
-        jLabel2.setFont(new java.awt.Font("Arial", 0, 14)); // NOI18N
-        jLabel2.setText("Click a card on the left the matches either the current card's color or number");
-        jPanel2.add(jLabel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(6, 66, -1, -1));
+        lblDescription1.setFont(new java.awt.Font("Arial", 0, 14)); // NOI18N
+        lblDescription1.setText("Click a card on the left the matches either the current card's color or number");
+        pnlHelpInner.add(lblDescription1, new org.netbeans.lib.awtextra.AbsoluteConstraints(6, 66, -1, -1));
 
-        jLabel3.setFont(new java.awt.Font("Arial Rounded MT Bold", 1, 18)); // NOI18N
-        jLabel3.setText("Wild Cards:");
-        jPanel2.add(jLabel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(6, 186, -1, -1));
+        lblWildCards.setFont(new java.awt.Font("Arial Rounded MT Bold", 1, 18)); // NOI18N
+        lblWildCards.setText("Wild Cards:");
+        pnlHelpInner.add(lblWildCards, new org.netbeans.lib.awtextra.AbsoluteConstraints(6, 186, -1, -1));
 
-        jLabel4.setFont(new java.awt.Font("Arial", 0, 14)); // NOI18N
-        jLabel4.setText("You have the option of playing a wild card any time you want, so use it wisely");
-        jPanel2.add(jLabel4, new org.netbeans.lib.awtextra.AbsoluteConstraints(6, 223, -1, -1));
+        lblDescription2.setFont(new java.awt.Font("Arial", 0, 14)); // NOI18N
+        lblDescription2.setText("You have the option of playing a wild card any time you want, so use it wisely");
+        pnlHelpInner.add(lblDescription2, new org.netbeans.lib.awtextra.AbsoluteConstraints(6, 223, -1, -1));
 
         btnOk.setFont(new java.awt.Font("Arial Rounded MT Bold", 1, 14)); // NOI18N
         btnOk.setText("Ok");
@@ -67,23 +67,23 @@ public class HelpWin extends javax.swing.JFrame {
                 btnOkActionPerformed(evt);
             }
         });
-        jPanel2.add(btnOk, new org.netbeans.lib.awtextra.AbsoluteConstraints(256, 352, 113, 37));
+        pnlHelpInner.add(btnOk, new org.netbeans.lib.awtextra.AbsoluteConstraints(256, 352, 113, 37));
 
-        jLabel5.setFont(new java.awt.Font("Arial", 0, 14)); // NOI18N
-        jLabel5.setText("You also have the option of changing the color to anything you want ");
-        jPanel2.add(jLabel5, new org.netbeans.lib.awtextra.AbsoluteConstraints(6, 258, -1, -1));
+        lblDescription3.setFont(new java.awt.Font("Arial", 0, 14)); // NOI18N
+        lblDescription3.setText("You also have the option of changing the color to anything you want ");
+        pnlHelpInner.add(lblDescription3, new org.netbeans.lib.awtextra.AbsoluteConstraints(6, 258, -1, -1));
 
-        jTabbedPane1.addTab("Help", jPanel2);
+        tabbedHelp.addTab("Help", pnlHelpInner);
 
         javax.swing.GroupLayout pnlHelpLayout = new javax.swing.GroupLayout(pnlHelp);
         pnlHelp.setLayout(pnlHelpLayout);
         pnlHelpLayout.setHorizontalGroup(
             pnlHelpLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jTabbedPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 676, javax.swing.GroupLayout.PREFERRED_SIZE)
+            .addComponent(tabbedHelp, javax.swing.GroupLayout.PREFERRED_SIZE, 676, javax.swing.GroupLayout.PREFERRED_SIZE)
         );
         pnlHelpLayout.setVerticalGroup(
             pnlHelpLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jTabbedPane1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+            .addComponent(tabbedHelp, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
@@ -142,13 +142,13 @@ public class HelpWin extends javax.swing.JFrame {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnOk;
-    private javax.swing.JLabel jLabel1;
-    private javax.swing.JLabel jLabel2;
-    private javax.swing.JLabel jLabel3;
-    private javax.swing.JLabel jLabel4;
-    private javax.swing.JLabel jLabel5;
-    private javax.swing.JPanel jPanel2;
-    private javax.swing.JTabbedPane jTabbedPane1;
+    private javax.swing.JLabel lblDescription1;
+    private javax.swing.JLabel lblDescription2;
+    private javax.swing.JLabel lblDescription3;
+    private javax.swing.JLabel lblWhatDoIDo;
+    private javax.swing.JLabel lblWildCards;
     private javax.swing.JPanel pnlHelp;
+    private javax.swing.JPanel pnlHelpInner;
+    private javax.swing.JTabbedPane tabbedHelp;
     // End of variables declaration//GEN-END:variables
 }

@@ -64,11 +64,6 @@ public class PlayerInfoWin extends javax.swing.JFrame {
         String name2 = jtfName2.getText();
         String name3 = jtfName3.getText();
         String name4 = jtfName4.getText();
-        // Make sure the names are being retrieved
-        System.out.println(name1);
-        System.out.println(name2);
-        System.out.println(name3);
-        System.out.println(name4);
         if(numberOfPlayers == 4){
             playerNames.add(name1);
             playerNames.add(name2);
@@ -99,8 +94,8 @@ public class PlayerInfoWin extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        jPanel1 = new javax.swing.JPanel();
-        jLabel1 = new javax.swing.JLabel();
+        pnlPlayerNames = new javax.swing.JPanel();
+        lblEnterNames = new javax.swing.JLabel();
         lblName1 = new javax.swing.JLabel();
         lblName3 = new javax.swing.JLabel();
         lblName2 = new javax.swing.JLabel();
@@ -109,44 +104,44 @@ public class PlayerInfoWin extends javax.swing.JFrame {
         jtfName1 = new javax.swing.JTextField();
         jtfName4 = new javax.swing.JTextField();
         jtfName3 = new javax.swing.JTextField();
-        jButton1 = new javax.swing.JButton();
-        jButton2 = new javax.swing.JButton();
-        lblName5 = new javax.swing.JLabel();
-        jLabel3 = new javax.swing.JLabel();
+        btnContinue = new javax.swing.JButton();
+        btnGoBack = new javax.swing.JButton();
+        lblNote = new javax.swing.JLabel();
+        lblFrostyImage = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
-        jPanel1.setBackground(new java.awt.Color(153, 255, 153));
-        jPanel1.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
+        pnlPlayerNames.setBackground(new java.awt.Color(153, 255, 153));
+        pnlPlayerNames.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
-        jLabel1.setBackground(new java.awt.Color(102, 255, 102));
-        jLabel1.setFont(new java.awt.Font("Lucida Bright", 1, 36)); // NOI18N
-        jLabel1.setForeground(new java.awt.Color(255, 255, 255));
-        jLabel1.setText("Enter Player Names:");
-        jPanel1.add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(260, 20, -1, -1));
+        lblEnterNames.setBackground(new java.awt.Color(102, 255, 102));
+        lblEnterNames.setFont(new java.awt.Font("Lucida Bright", 1, 36)); // NOI18N
+        lblEnterNames.setForeground(new java.awt.Color(255, 255, 255));
+        lblEnterNames.setText("Enter Player Names:");
+        pnlPlayerNames.add(lblEnterNames, new org.netbeans.lib.awtextra.AbsoluteConstraints(260, 20, -1, -1));
 
         lblName1.setFont(new java.awt.Font("Lucida Sans", 1, 24)); // NOI18N
         lblName1.setForeground(new java.awt.Color(255, 255, 255));
         lblName1.setText("Player 1:");
-        jPanel1.add(lblName1, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 77, -1, -1));
+        pnlPlayerNames.add(lblName1, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 77, -1, -1));
 
         lblName3.setFont(new java.awt.Font("Lucida Sans", 1, 24)); // NOI18N
         lblName3.setForeground(new java.awt.Color(255, 255, 255));
         lblName3.setText("Player 3:");
-        jPanel1.add(lblName3, new org.netbeans.lib.awtextra.AbsoluteConstraints(22, 267, -1, -1));
+        pnlPlayerNames.add(lblName3, new org.netbeans.lib.awtextra.AbsoluteConstraints(22, 267, -1, -1));
 
         lblName2.setFont(new java.awt.Font("Lucida Sans", 1, 24)); // NOI18N
         lblName2.setForeground(new java.awt.Color(255, 255, 255));
         lblName2.setText("Player 2:");
-        jPanel1.add(lblName2, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 176, -1, -1));
+        pnlPlayerNames.add(lblName2, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 176, -1, -1));
 
         lblName4.setFont(new java.awt.Font("Lucida Sans", 1, 24)); // NOI18N
         lblName4.setForeground(new java.awt.Color(255, 255, 255));
         lblName4.setText("Player 4:");
-        jPanel1.add(lblName4, new org.netbeans.lib.awtextra.AbsoluteConstraints(22, 360, -1, -1));
+        pnlPlayerNames.add(lblName4, new org.netbeans.lib.awtextra.AbsoluteConstraints(22, 360, -1, -1));
 
         jtfName2.setFont(new java.awt.Font("Arial Rounded MT Bold", 0, 24)); // NOI18N
-        jPanel1.add(jtfName2, new org.netbeans.lib.awtextra.AbsoluteConstraints(140, 170, 648, 42));
+        pnlPlayerNames.add(jtfName2, new org.netbeans.lib.awtextra.AbsoluteConstraints(140, 170, 648, 42));
 
         jtfName1.setFont(new java.awt.Font("Arial Rounded MT Bold", 0, 24)); // NOI18N
         jtfName1.addActionListener(new java.awt.event.ActionListener() {
@@ -154,56 +149,56 @@ public class PlayerInfoWin extends javax.swing.JFrame {
                 jtfName1ActionPerformed(evt);
             }
         });
-        jPanel1.add(jtfName1, new org.netbeans.lib.awtextra.AbsoluteConstraints(140, 75, 648, 42));
+        pnlPlayerNames.add(jtfName1, new org.netbeans.lib.awtextra.AbsoluteConstraints(140, 75, 648, 42));
 
         jtfName4.setFont(new java.awt.Font("Arial Rounded MT Bold", 0, 24)); // NOI18N
-        jPanel1.add(jtfName4, new org.netbeans.lib.awtextra.AbsoluteConstraints(140, 360, 648, 42));
+        pnlPlayerNames.add(jtfName4, new org.netbeans.lib.awtextra.AbsoluteConstraints(140, 360, 648, 42));
 
         jtfName3.setFont(new java.awt.Font("Arial Rounded MT Bold", 0, 24)); // NOI18N
-        jPanel1.add(jtfName3, new org.netbeans.lib.awtextra.AbsoluteConstraints(140, 270, 648, 42));
+        pnlPlayerNames.add(jtfName3, new org.netbeans.lib.awtextra.AbsoluteConstraints(140, 270, 648, 42));
 
-        jButton1.setFont(new java.awt.Font("Arial Rounded MT Bold", 1, 18)); // NOI18N
-        jButton1.setText("Continue");
-        jButton1.addActionListener(new java.awt.event.ActionListener() {
+        btnContinue.setFont(new java.awt.Font("Arial Rounded MT Bold", 1, 18)); // NOI18N
+        btnContinue.setText("Continue");
+        btnContinue.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton1ActionPerformed(evt);
+                btnContinueActionPerformed(evt);
             }
         });
-        jPanel1.add(jButton1, new org.netbeans.lib.awtextra.AbsoluteConstraints(310, 470, 320, 100));
+        pnlPlayerNames.add(btnContinue, new org.netbeans.lib.awtextra.AbsoluteConstraints(310, 470, 320, 100));
 
-        jButton2.setBackground(new java.awt.Color(255, 0, 51));
-        jButton2.setFont(new java.awt.Font("Arial Rounded MT Bold", 1, 14)); // NOI18N
-        jButton2.setText("Return to Main Menu");
-        jButton2.addActionListener(new java.awt.event.ActionListener() {
+        btnGoBack.setBackground(new java.awt.Color(255, 0, 51));
+        btnGoBack.setFont(new java.awt.Font("Arial Rounded MT Bold", 1, 14)); // NOI18N
+        btnGoBack.setText("Return to Main Menu");
+        btnGoBack.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton2ActionPerformed(evt);
+                btnGoBackActionPerformed(evt);
             }
         });
-        jPanel1.add(jButton2, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 570, 220, 50));
+        pnlPlayerNames.add(btnGoBack, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 570, 220, 50));
 
-        lblName5.setFont(new java.awt.Font("Lucida Sans", 1, 24)); // NOI18N
-        lblName5.setForeground(new java.awt.Color(255, 255, 255));
-        lblName5.setText("Note: Player 1 Starts First!!!");
-        jPanel1.add(lblName5, new org.netbeans.lib.awtextra.AbsoluteConstraints(300, 430, -1, -1));
+        lblNote.setFont(new java.awt.Font("Lucida Sans", 1, 24)); // NOI18N
+        lblNote.setForeground(new java.awt.Color(255, 255, 255));
+        lblNote.setText("Note: Player 1 Starts First!!!");
+        pnlPlayerNames.add(lblNote, new org.netbeans.lib.awtextra.AbsoluteConstraints(300, 430, -1, -1));
 
-        jLabel3.setIcon(new javax.swing.ImageIcon(getClass().getResource("/unobackground2.png"))); // NOI18N
-        jPanel1.add(jLabel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, -20, 1030, 770));
+        lblFrostyImage.setIcon(new javax.swing.ImageIcon(getClass().getResource("/unobackground2.png"))); // NOI18N
+        pnlPlayerNames.add(lblFrostyImage, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, -20, 1030, 770));
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+            .addComponent(pnlPlayerNames, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, 656, javax.swing.GroupLayout.PREFERRED_SIZE)
+            .addComponent(pnlPlayerNames, javax.swing.GroupLayout.PREFERRED_SIZE, 656, javax.swing.GroupLayout.PREFERRED_SIZE)
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+    private void btnContinueActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnContinueActionPerformed
         // TODO add your handling code here:
         boolean flag = checkValidName();
         if(flag == false){
@@ -216,18 +211,18 @@ public class PlayerInfoWin extends javax.swing.JFrame {
             win.setVisible(true);
             this.dispose();
         }
-    }//GEN-LAST:event_jButton1ActionPerformed
+    }//GEN-LAST:event_btnContinueActionPerformed
 
     private void jtfName1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jtfName1ActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_jtfName1ActionPerformed
 
-    private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
+    private void btnGoBackActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnGoBackActionPerformed
         // TODO add your handling code here:
         this.dispose();
-        Uno homepage = new Uno();
+        UnoMain homepage = new UnoMain();
         homepage.setVisible(true);
-    }//GEN-LAST:event_jButton2ActionPerformed
+    }//GEN-LAST:event_btnGoBackActionPerformed
 
     /**
      * @param args the command line arguments
@@ -265,19 +260,19 @@ public class PlayerInfoWin extends javax.swing.JFrame {
 //    }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton jButton1;
-    private javax.swing.JButton jButton2;
-    private javax.swing.JLabel jLabel1;
-    private javax.swing.JLabel jLabel3;
-    private javax.swing.JPanel jPanel1;
+    private javax.swing.JButton btnContinue;
+    private javax.swing.JButton btnGoBack;
     private javax.swing.JTextField jtfName1;
     private javax.swing.JTextField jtfName2;
     private javax.swing.JTextField jtfName3;
     private javax.swing.JTextField jtfName4;
+    private javax.swing.JLabel lblEnterNames;
+    private javax.swing.JLabel lblFrostyImage;
     private javax.swing.JLabel lblName1;
     private javax.swing.JLabel lblName2;
     private javax.swing.JLabel lblName3;
     private javax.swing.JLabel lblName4;
-    private javax.swing.JLabel lblName5;
+    private javax.swing.JLabel lblNote;
+    private javax.swing.JPanel pnlPlayerNames;
     // End of variables declaration//GEN-END:variables
 }

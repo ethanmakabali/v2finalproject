@@ -27,36 +27,33 @@ public class InstructionsWin extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        jPanel1 = new javax.swing.JPanel();
-        jLabel1 = new javax.swing.JLabel();
-        jLabel2 = new javax.swing.JLabel();
+        pnlInstructions = new javax.swing.JPanel();
+        lblHowToPlay = new javax.swing.JLabel();
+        lblObjective = new javax.swing.JLabel();
         btn3Players = new javax.swing.JButton();
         btn2Players = new javax.swing.JButton();
         btn4Players = new javax.swing.JButton();
-        jLabel3 = new javax.swing.JLabel();
-        jLabel4 = new javax.swing.JLabel();
-        jLabel5 = new javax.swing.JLabel();
-        jLabel6 = new javax.swing.JLabel();
-        jLabel7 = new javax.swing.JLabel();
-        jLabel8 = new javax.swing.JLabel();
-        jLabel9 = new javax.swing.JLabel();
-        jLabel10 = new javax.swing.JLabel();
-        jLabel11 = new javax.swing.JLabel();
+        lblQuestion = new javax.swing.JLabel();
+        lblDescription1 = new javax.swing.JLabel();
+        lblDescription2 = new javax.swing.JLabel();
+        lblDescription4 = new javax.swing.JLabel();
+        lblDescription3 = new javax.swing.JLabel();
+        lblPurpleImage = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
-        jPanel1.setBackground(new java.awt.Color(153, 255, 153));
-        jPanel1.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
+        pnlInstructions.setBackground(new java.awt.Color(153, 255, 153));
+        pnlInstructions.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
-        jLabel1.setFont(new java.awt.Font("Arial Rounded MT Bold", 1, 48)); // NOI18N
-        jLabel1.setForeground(new java.awt.Color(204, 255, 255));
-        jLabel1.setText("How to play:");
-        jPanel1.add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(292, 20, -1, -1));
+        lblHowToPlay.setFont(new java.awt.Font("Arial Rounded MT Bold", 1, 48)); // NOI18N
+        lblHowToPlay.setForeground(new java.awt.Color(204, 255, 255));
+        lblHowToPlay.setText("How to play:");
+        pnlInstructions.add(lblHowToPlay, new org.netbeans.lib.awtextra.AbsoluteConstraints(292, 20, -1, -1));
 
-        jLabel2.setFont(new java.awt.Font("Arial Rounded MT Bold", 1, 24)); // NOI18N
-        jLabel2.setForeground(new java.awt.Color(153, 255, 255));
-        jLabel2.setText("Objective:");
-        jPanel1.add(jLabel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(47, 93, -1, -1));
+        lblObjective.setFont(new java.awt.Font("Arial Rounded MT Bold", 1, 48)); // NOI18N
+        lblObjective.setForeground(new java.awt.Color(153, 255, 255));
+        lblObjective.setText("Objective:");
+        pnlInstructions.add(lblObjective, new org.netbeans.lib.awtextra.AbsoluteConstraints(47, 93, -1, -1));
 
         btn3Players.setFont(new java.awt.Font("Arial Rounded MT Bold", 1, 24)); // NOI18N
         btn3Players.setText("3 Players");
@@ -65,7 +62,7 @@ public class InstructionsWin extends javax.swing.JFrame {
                 btn3PlayersActionPerformed(evt);
             }
         });
-        jPanel1.add(btn3Players, new org.netbeans.lib.awtextra.AbsoluteConstraints(376, 554, 229, 68));
+        pnlInstructions.add(btn3Players, new org.netbeans.lib.awtextra.AbsoluteConstraints(376, 554, 229, 68));
 
         btn2Players.setFont(new java.awt.Font("Arial Rounded MT Bold", 1, 24)); // NOI18N
         btn2Players.setText("2 Players");
@@ -74,7 +71,7 @@ public class InstructionsWin extends javax.swing.JFrame {
                 btn2PlayersActionPerformed(evt);
             }
         });
-        jPanel1.add(btn2Players, new org.netbeans.lib.awtextra.AbsoluteConstraints(93, 554, 229, 68));
+        pnlInstructions.add(btn2Players, new org.netbeans.lib.awtextra.AbsoluteConstraints(93, 554, 229, 68));
 
         btn4Players.setFont(new java.awt.Font("Arial Rounded MT Bold", 1, 24)); // NOI18N
         btn4Players.setText("4 Players");
@@ -83,62 +80,49 @@ public class InstructionsWin extends javax.swing.JFrame {
                 btn4PlayersActionPerformed(evt);
             }
         });
-        jPanel1.add(btn4Players, new org.netbeans.lib.awtextra.AbsoluteConstraints(669, 554, 229, 68));
+        pnlInstructions.add(btn4Players, new org.netbeans.lib.awtextra.AbsoluteConstraints(669, 554, 229, 68));
 
-        jLabel3.setFont(new java.awt.Font("Arial Rounded MT Bold", 1, 24)); // NOI18N
-        jLabel3.setForeground(new java.awt.Color(204, 255, 255));
-        jLabel3.setText("How many players do you have?");
-        jPanel1.add(jLabel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(292, 493, -1, -1));
+        lblQuestion.setFont(new java.awt.Font("Arial Rounded MT Bold", 1, 24)); // NOI18N
+        lblQuestion.setForeground(new java.awt.Color(204, 255, 255));
+        lblQuestion.setText("How many players do you have?");
+        pnlInstructions.add(lblQuestion, new org.netbeans.lib.awtextra.AbsoluteConstraints(292, 493, -1, -1));
 
-        jLabel4.setFont(new java.awt.Font("Arial Rounded MT Bold", 0, 14)); // NOI18N
-        jLabel4.setForeground(new java.awt.Color(204, 255, 255));
-        jLabel4.setText("The objective of your game is to get rid of all your cards");
-        jPanel1.add(jLabel4, new org.netbeans.lib.awtextra.AbsoluteConstraints(47, 140, -1, -1));
+        lblDescription1.setFont(new java.awt.Font("Arial Rounded MT Bold", 0, 18)); // NOI18N
+        lblDescription1.setForeground(new java.awt.Color(204, 255, 255));
+        lblDescription1.setText("The objective of your game is to get rid of all your cards");
+        pnlInstructions.add(lblDescription1, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 180, -1, -1));
 
-        jLabel5.setFont(new java.awt.Font("Arial Rounded MT Bold", 1, 24)); // NOI18N
-        jLabel5.setForeground(new java.awt.Color(153, 255, 255));
-        jLabel5.setText("Rules:");
-        jPanel1.add(jLabel5, new org.netbeans.lib.awtextra.AbsoluteConstraints(47, 313, -1, -1));
+        lblDescription2.setFont(new java.awt.Font("Arial Rounded MT Bold", 0, 18)); // NOI18N
+        lblDescription2.setForeground(new java.awt.Color(204, 255, 255));
+        lblDescription2.setText("Play any card that matches either the color or number of the current card in the discard pile");
+        pnlInstructions.add(lblDescription2, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 220, -1, -1));
 
-        jLabel6.setFont(new java.awt.Font("Arial Rounded MT Bold", 0, 14)); // NOI18N
-        jLabel6.setForeground(new java.awt.Color(204, 255, 255));
-        jLabel6.setText("There is a limit of 20 cards per deck, if you go over, you are automatically disqualified");
-        jPanel1.add(jLabel6, new org.netbeans.lib.awtextra.AbsoluteConstraints(47, 360, -1, -1));
+        lblDescription4.setFont(new java.awt.Font("Arial Rounded MT Bold", 0, 18)); // NOI18N
+        lblDescription4.setForeground(new java.awt.Color(204, 255, 255));
+        lblDescription4.setText("If you have no legal moves when its your turn , draw one card and move on to the next player (automatic)");
+        pnlInstructions.add(lblDescription4, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 300, -1, -1));
 
-        jLabel7.setFont(new java.awt.Font("Arial Rounded MT Bold", 0, 14)); // NOI18N
-        jLabel7.setForeground(new java.awt.Color(204, 255, 255));
-        jLabel7.setText("Play any card that matches either the color or number of the current card in the discard pile");
-        jPanel1.add(jLabel7, new org.netbeans.lib.awtextra.AbsoluteConstraints(47, 175, -1, -1));
+        lblDescription3.setFont(new java.awt.Font("Arial Rounded MT Bold", 0, 18)); // NOI18N
+        lblDescription3.setForeground(new java.awt.Color(204, 255, 255));
+        lblDescription3.setText("Once you have played a card, a seperate screen will pop up hiding the next players cards, hand the computer to the next player");
+        pnlInstructions.add(lblDescription3, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 260, -1, -1));
 
-        jLabel8.setFont(new java.awt.Font("Arial Rounded MT Bold", 0, 14)); // NOI18N
-        jLabel8.setForeground(new java.awt.Color(204, 255, 255));
-        jLabel8.setText("If you have no legal moves when its your turn , draw one card and move on to the next player (automatic)");
-        jPanel1.add(jLabel8, new org.netbeans.lib.awtextra.AbsoluteConstraints(47, 243, -1, -1));
-
-        jLabel9.setFont(new java.awt.Font("Arial Rounded MT Bold", 0, 14)); // NOI18N
-        jLabel9.setForeground(new java.awt.Color(204, 255, 255));
-        jLabel9.setText("When you have 1 card left in your deck, you must click the Uno button, or else you will draw 2 cards");
-        jPanel1.add(jLabel9, new org.netbeans.lib.awtextra.AbsoluteConstraints(47, 278, -1, -1));
-
-        jLabel10.setFont(new java.awt.Font("Arial Rounded MT Bold", 0, 14)); // NOI18N
-        jLabel10.setForeground(new java.awt.Color(204, 255, 255));
-        jLabel10.setText("Once you have played a card, a seperate screen will pop up hiding the next players cards, hand the computer to the next player");
-        jPanel1.add(jLabel10, new org.netbeans.lib.awtextra.AbsoluteConstraints(47, 208, -1, -1));
-
-        jLabel11.setForeground(new java.awt.Color(204, 255, 255));
-        jLabel11.setIcon(new javax.swing.ImageIcon(getClass().getResource("/purple_background.png"))); // NOI18N
-        jLabel11.setText("jLabel11");
-        jPanel1.add(jLabel11, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 1000, 680));
+        lblPurpleImage.setForeground(new java.awt.Color(204, 255, 255));
+        lblPurpleImage.setIcon(new javax.swing.ImageIcon(getClass().getResource("/purple_background.png"))); // NOI18N
+        lblPurpleImage.setText("jLabel11");
+        pnlInstructions.add(lblPurpleImage, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 1180, 680));
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jPanel1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addGroup(layout.createSequentialGroup()
+                .addComponent(pnlInstructions, javax.swing.GroupLayout.PREFERRED_SIZE, 1176, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(0, 0, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addComponent(pnlInstructions, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
 
         pack();
@@ -204,17 +188,14 @@ public class InstructionsWin extends javax.swing.JFrame {
     private javax.swing.JButton btn2Players;
     private javax.swing.JButton btn3Players;
     private javax.swing.JButton btn4Players;
-    private javax.swing.JLabel jLabel1;
-    private javax.swing.JLabel jLabel10;
-    private javax.swing.JLabel jLabel11;
-    private javax.swing.JLabel jLabel2;
-    private javax.swing.JLabel jLabel3;
-    private javax.swing.JLabel jLabel4;
-    private javax.swing.JLabel jLabel5;
-    private javax.swing.JLabel jLabel6;
-    private javax.swing.JLabel jLabel7;
-    private javax.swing.JLabel jLabel8;
-    private javax.swing.JLabel jLabel9;
-    private javax.swing.JPanel jPanel1;
+    private javax.swing.JLabel lblDescription1;
+    private javax.swing.JLabel lblDescription2;
+    private javax.swing.JLabel lblDescription3;
+    private javax.swing.JLabel lblDescription4;
+    private javax.swing.JLabel lblHowToPlay;
+    private javax.swing.JLabel lblObjective;
+    private javax.swing.JLabel lblPurpleImage;
+    private javax.swing.JLabel lblQuestion;
+    private javax.swing.JPanel pnlInstructions;
     // End of variables declaration//GEN-END:variables
 }

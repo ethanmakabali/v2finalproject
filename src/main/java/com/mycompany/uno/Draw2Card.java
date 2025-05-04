@@ -29,6 +29,7 @@ public class Draw2Card extends Card {
             return this.color.equalsIgnoreCase(currentCard.getColor());
         }
 
+        // Checks if the colors match, ignoring upper/lowercase differences 
         if (currentCard.getColor().equalsIgnoreCase(this.color)) {
             return true;
         }
@@ -39,7 +40,6 @@ public class Draw2Card extends Card {
 
         return false;
     }
-
     
     @Override
     public boolean isReverse(){

@@ -22,15 +22,12 @@ public abstract class Card {
     }
     
     public abstract String toString();
-    
     public abstract boolean canPlayCard(Card currentCard);
-    
     public abstract boolean isReverse();
     public abstract boolean isSkip();
     public abstract boolean isWildcard();
     public abstract boolean isAddCard();
     public abstract int addCardsCount();
     public abstract void declareColor(String color);
-    
     public abstract String getImageName();
 }
